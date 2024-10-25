@@ -452,9 +452,16 @@ class App:
             
         for restaurant in restaurants_catalog:
             print(restaurant)
+        print('0. Logout')
         
         chosen_restaurant = Utils.int_input('Digite o número do restaurante escolhido: ')
         
+        if chosen_restaurant == 0:
+            print(f'Até logo!')
+            Utils.sleep(5)
+            self.current_client = None
+            self.show_area_menu()
+            
         if DB.verify_existing_restaurant(app, chosen_restaurant):
             self.show_chosen_restaurant(chosen_restaurant)
         else:
