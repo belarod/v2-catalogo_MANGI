@@ -389,6 +389,9 @@ class DB:
         records = cur.fetchall()
         cur.close()
         
+        if not records:
+            return False 
+        
         formatted_list = []
         for i in range(len(records)):
             record = records[i]

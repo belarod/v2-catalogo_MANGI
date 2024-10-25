@@ -209,7 +209,7 @@ class App:
                     print(f'Até logo, {restaurant.name_restaurant}!')
                     Utils.sleep(5)
                     self.current_restaurant = None
-                    self.show_restaurant_menu()
+                    self.show_area_menu()
 
                 else:
                     Utils.clear_screen()
@@ -442,6 +442,14 @@ class App:
         
         print(f'-- Restaurantes --')
         restaurants_catalog = DB.show_restaurants_catalog(app)
+        
+        if not restaurants_catalog:
+            Utils.clear_screen()
+            print(f'Ainda não possuimos restaurantes cadastrados no aplicativo. Volte em breve!')
+            Utils.sleep(5)
+            self.current_client = None
+            self.show_area_menu()
+            
         for restaurant in restaurants_catalog:
             print(restaurant)
         
