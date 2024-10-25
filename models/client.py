@@ -17,7 +17,9 @@ class Client:
     @staticmethod
     def verify_name_client(name_client):
         """ Verifica se nome do restaurante é maior ou igual a 10. """
-        if len(name_client) >= 10:
+        pattern = r'^[\wÀ-ÿ]+(?:\s+[\wÀ-ÿ]+)+$'
+        
+        if len(name_client) >= 10 and re.match(pattern, name_client):
             return True
         return False
 

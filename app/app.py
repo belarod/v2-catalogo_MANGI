@@ -109,7 +109,7 @@ class App:
         email = ''
         while not Restaurant.verify_email(email):
             print('*Deve ser um email válido.')
-            email = input('Email: ').lower() #adicionar a verificacao de existencia
+            email = input('Email: ').lower()
 
         password = ''
         while not Restaurant.verify_password(password):
@@ -117,9 +117,10 @@ class App:
             password = input('Senha: ')
             
         app = DB("example.db")    
-        if not DB.verify_existing_email_restaurant(app, email) and DB.verify_existing_email_client(app, email):
-            
+        if not DB.verify_existing_email_restaurant(app, email) and not DB.verify_existing_email_client(app, email): #verificar se funciona
             register_restaurant = Restaurant(pk=None, name_restaurant=name_restaurant, commission=commission, email=email, password=password, last_login=None)
+            
+            app = DB("example.db")
             DB.create_restaurant(app, register_restaurant)
             Utils.clear_screen()
             print(f'O restaurante {name_restaurant} foi registrado!')
@@ -140,7 +141,7 @@ class App:
         print('-- Login --')
         email = input('Email: ').lower()
         password = input('Senha: ')
-        restaurant = self.db.login(email=email, password=password)
+        restaurant = self.db.login_restaurant(email=email, password=password)
         
         if restaurant is None: #se login estiver incorreto ou nao existir
             print('Credenciais inválidas. Não possui cadastro? Registre-se agora mesmo!')
@@ -377,8 +378,8 @@ class App:
 
         name_client = ''
         while not Client.verify_name_client(name_client):
-            print('*Nome deve conter pelo menos 10 caracteres.')
-            name_client = Utils.str_no_digit_input('Nome do restaurante: ')
+            print('*Nome deve conter pelo menos 10 caracteres e conter sobrenome.')
+            name_client = Utils.str_no_digit_input('Seu nome: ')
 
         email = ''
         while not Client.verify_email(email):
@@ -391,7 +392,7 @@ class App:
             password = input('Senha: ')
             
         app = DB("example.db")    
-        if not DB.verify_existing_email_login(app, email) and DB.verify_existing_email_restaurant(app, email): 
+        if not DB.verify_existing_email_client(app, email) and not DB.verify_existing_email_restaurant(app, email): 
             register_client = Client(pk=None, name_client=name_client, email=email, password=password, last_login=None)
             
             DB.create_client(app, register_client) #criar no db.py funcao p criar cliente
@@ -412,7 +413,7 @@ class App:
         print('-- Login --')
         email = input('Email: ').lower()
         password = input('Senha: ')
-        client = self.db.login(email=email, password=password) #mudar o nome da funcao p login_restaurant e criar uma para ser usada neste, login_client
+        client = self.db.login_client(email=email, password=password) #criar login_client
         
         if client is None: #se login estiver incorreto ou nao existir
             print('Credenciais inválidas. Não possui cadastro? Registre-se agora mesmo!')
@@ -427,10 +428,20 @@ class App:
             last_login = DB.pull_last_login(app, client.pk) #mudar nome função e fazer nova p consulta do login do cliente
             
             Utils.clear_screen()
-            print(f'Bem vindo, {client.name_client} seu ID é {client.pk}.')
+            print(f'Bem vindo, {client.name_client}!')
             print(f'Último login: {last_login[0]}') # verificar indice
             Utils.sleep(10)
             
-            DB.push_current_login(app, current_date_login, client.pk) #renomear e criar p client
+            DB.push_current_login_restaurant(app, current_date_login, client.pk) #renomear e criar p client
             
             self.show_client_pannel(client) #criar essa funcao!!!!
+            
+    def show_client_pannel(self, client: Client):
+        Utils.clear_screen()
+        app = DB("example.db")
+        
+        print(f'-- Restaurantes --')
+        restaurants_catalog = DB.show_restaurants_catalog(app)
+        print(restaurants_catalog)
+        
+        chosen_restaurant = Utils.int_input('Digite o número do restaurante escolhido: ')

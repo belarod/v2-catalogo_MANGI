@@ -1,6 +1,7 @@
 import sqlite3
 from models.restaurant import Restaurant
 from models.product import Product
+from models.client import Client
 
 
 class DB:
@@ -74,10 +75,24 @@ class DB:
 
         self.connection.commit()
         cur.close()
+        
+        
+        
+    def create_client(self, client: Client):
+        """ Cria cliente de acordo com os inputs do app. (self, client: Client)"""
+        cur = self.connection.cursor()
+
+        cur.execute('''
+        INSERT INTO client (name_client, email, password) VALUES (?, ?, ?)
+        ''', (client.name_client, client.email, client.password)
+                    )
+
+        self.connection.commit()
+        cur.close()
 
 
 
-    def login(self, email: str, password: str): #renomear
+    def login_restaurant(self, email: str, password: str): #renomear
         """ Realiza login se caso a combinação exista no DB, e atribui o usuário de acordo com o restaurante acessado. Retorna instância de Restaurant. (self, email: str, password: str)"""
         cur = self.connection.cursor()
 
@@ -97,6 +112,28 @@ class DB:
                            password=record[4],
                            last_login=record[5])
         return restaurant
+    
+    
+    
+    def login_client(self, email: str, password: str): #renomear
+        """ Realiza login se caso a combinação exista no DB, e atribui o usuário de acordo com o cliente acessado. Retorna instância de Client. (self, email: str, password: str)"""
+        cur = self.connection.cursor()
+
+        cur.execute('''
+                SELECT id, name_client, email, password, last_login
+                FROM client
+                WHERE email = ? and password = ?
+                ''', (email, password))
+        record = cur.fetchone()
+        cur.close()
+        if record is None:
+            return None
+        client = Client(pk=record[0],
+                           name_client=record[1],
+                           email=record[2],
+                           password=record[3],
+                           last_login=record[4])
+        return client
     
     
     
@@ -182,9 +219,9 @@ class DB:
             print(f"A maior comissão entre todos os restaurantes é de {highest_commission[0]}%!")
             return highest_commission
         else:
-            return None
-        
-        cur.close()
+            cur.close()#alterado
+            return None 
+
         
         
         
@@ -207,7 +244,7 @@ class DB:
         
         
         
-    def push_current_login(self, current_date_login: str, pk: int):
+    def push_current_login_restaurant(self, current_date_login: str, pk: int):
         """ Insere no DB data/hora em que foi acessado. (self, current_date_login: str, pk: int)"""
         cur = self.connection.cursor()
         
@@ -292,3 +329,20 @@ class DB:
         if record is not None:
             return True
         return False
+    
+    def show_restaurants_catalog(self):
+        
+        cur = self.connection.cursor()
+    
+        cur.execute('''
+                        SELECT id, name_restaurant
+                        FROM restaurant
+                        ''')
+    
+        records = cur.fetchall()
+        cur.close()
+        
+        if records:
+            formatted_list = "\n".join(f"{record[0]}. {record[1]}" for record in records)
+            
+        return formatted_list
