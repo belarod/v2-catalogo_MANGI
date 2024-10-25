@@ -77,7 +77,7 @@ class DB:
 
 
 
-    def login(self, email: str, password: str):
+    def login(self, email: str, password: str): #renomear
         """ Realiza login se caso a combinação exista no DB, e atribui o usuário de acordo com o restaurante acessado. Retorna instância de Restaurant. (self, email: str, password: str)"""
         cur = self.connection.cursor()
 
@@ -238,13 +238,32 @@ class DB:
 
 
 
-    def verify_existing_email(self, email: str):
+    def verify_existing_email_restaurant(self, email: str):
         """ Consulta no DB se já existe o parâmetro (email) cadastrado. Retorna True, se não existe, False, se já existe. (self, email: str)"""
         cur = self.connection.cursor()
     
         cur.execute('''
                         SELECT email
                         FROM restaurant
+                        WHERE email = ?
+                        ''', (email,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        if record is None:
+            return False
+        return True
+    
+    
+    
+    def verify_existing_email_client(self, email: str):
+        """ Consulta no DB se já existe o parâmetro (email) cadastrado. Retorna True, se não existe, False, se já existe. (self, email: str)"""
+        cur = self.connection.cursor()
+    
+        cur.execute('''
+                        SELECT email
+                        FROM client
                         WHERE email = ?
                         ''', (email,))
     

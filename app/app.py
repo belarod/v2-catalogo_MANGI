@@ -4,6 +4,8 @@ from database.db import DB
 
 from models.product import Product
 from models.restaurant import Restaurant
+from models.client import Client
+from models.client_order import Client_order
 from utils.utils import Utils
 
 #inicia app
@@ -107,7 +109,7 @@ class App:
         email = ''
         while not Restaurant.verify_email(email):
             print('*Deve ser um email válido.')
-            email = input('Email: ').lower()
+            email = input('Email: ').lower() #adicionar a verificacao de existencia
 
         password = ''
         while not Restaurant.verify_password(password):
@@ -115,10 +117,9 @@ class App:
             password = input('Senha: ')
             
         app = DB("example.db")    
-        if not DB.verify_existing_email(app, email):
-            register_restaurant = Restaurant(pk=None, name_restaurant=name_restaurant, commission=commission, email=email, password=password, last_login=None)
+        if not DB.verify_existing_email_restaurant(app, email) and DB.verify_existing_email_client(app, email):
             
-            app = DB("example.db")
+            register_restaurant = Restaurant(pk=None, name_restaurant=name_restaurant, commission=commission, email=email, password=password, last_login=None)
             DB.create_restaurant(app, register_restaurant)
             Utils.clear_screen()
             print(f'O restaurante {name_restaurant} foi registrado!')
@@ -375,25 +376,24 @@ class App:
         print('-- Registre-se --')
 
         name_client = ''
-        while not Client.verify_name_client(name_client): #criar funcao verify nome cliente e classe Client
+        while not Client.verify_name_client(name_client):
             print('*Nome deve conter pelo menos 10 caracteres.')
             name_client = Utils.str_no_digit_input('Nome do restaurante: ')
 
         email = ''
-        while not Client.verify_email(email): #criar funcao verify email
+        while not Client.verify_email(email):
             print('*Deve ser um email válido.')
             email = input('Email: ').lower()
 
         password = ''
-        while not Client.verify_password(password): #criar fincao verify password
+        while not Client.verify_password(password):
             print('*Deve conter ao menos uma letra maiúscila, uma minúscula e um número.')
             password = input('Senha: ')
             
         app = DB("example.db")    
-        if not DB.verify_existing_email(app, email): #adicionar consulta para db de client
+        if not DB.verify_existing_email_login(app, email) and DB.verify_existing_email_restaurant(app, email): 
             register_client = Client(pk=None, name_client=name_client, email=email, password=password, last_login=None)
             
-            app = DB("example.db")
             DB.create_client(app, register_client) #criar no db.py funcao p criar cliente
             Utils.clear_screen()
             print(f'{name_client} foi registrado!')
