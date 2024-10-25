@@ -28,27 +28,25 @@ class App:
 
     def start_app(self):
         """ Inicia o app. (self)"""
-        self.show_main_menu()
-
-
-
-    def show_main_menu(self):
-        """ Mostra menu principal. (self)"""
-        Utils.clear_screen()
+        self.show_area_menu()
+        
+    
+    
+    def show_area_menu(self):
         while True:
             print('-- Tela Inicial --')
-            print('1. Cadastrar restaurante')
-            print('2. Login')
+            print('1. Área Restaurante')
+            print('2. Área Cliente')
 
             res = input('Escolha uma opção: ')
 
             if res == '1':
                 Utils.clear_screen()
-                self.show_register_menu()
+                self.show_restaurant_menu()
                 break
             elif res == '2':
                 Utils.clear_screen()
-                self.show_login_menu()
+                self.show_client_menu() #falta criar
                 break
             else:
                 Utils.clear_screen()
@@ -56,8 +54,37 @@ class App:
 
 
 
-    def show_register_menu(self):
-        """ Abre menu para registro. (self)"""
+    def show_restaurant_menu(self):
+        """ Mostra menu para restaurantes. (self)"""
+        Utils.clear_screen()
+        while True:
+            print('-- Área Restaurante --')
+            print('1. Cadastrar')
+            print('2. Login')
+            print('3. Voltar')
+
+            res = input('Escolha uma opção: ')
+
+            if res == '1':
+                Utils.clear_screen()
+                self.show_restaurant_register_menu()
+                break
+            elif res == '2':
+                Utils.clear_screen()
+                self.show_restaurant_login_menu()
+                break
+            elif res == '3':
+                Utils.clear_screen()
+                self.show_area_menu()
+                break
+            else:
+                Utils.clear_screen()
+                print('Esta opção não é valida, digite um dos números acima.')
+
+
+
+    def show_restaurant_register_menu(self):
+        """ Abre menu para registro do restaurante. (self)"""
         Utils.clear_screen()
         print('-- Registre seu restaurante --')
 
@@ -96,16 +123,16 @@ class App:
             Utils.clear_screen()
             print(f'O restaurante {name_restaurant} foi registrado!')
             Utils.sleep(5)
-            self.show_main_menu()
+            self.show_restaurant_menu()
         else:
             Utils.clear_screen()
             print(f'Este email já está em uso.')
             Utils.sleep(5)
-            self.show_main_menu()
+            self.show_restaurant_menu()
 
 
 
-    def show_login_menu(self):
+    def show_restaurant_login_menu(self):
         """ Abre menu para login (self)"""
         Utils.clear_screen()
 
@@ -118,7 +145,7 @@ class App:
             print('Credenciais inválidas. Não possui cadastro? Registre-se agora mesmo!')
             Utils.sleep(5)
             Utils.clear_screen()
-            self.show_main_menu()
+            self.show_restaurant_menu()
         else:
             self.current_restaurant = restaurant
             
@@ -180,7 +207,7 @@ class App:
                     print(f'Até logo, {restaurant.name_restaurant}!')
                     Utils.sleep(5)
                     self.current_restaurant = None
-                    self.show_main_menu()
+                    self.show_restaurant_menu()
 
                 else:
                     Utils.clear_screen()
@@ -216,7 +243,7 @@ class App:
                     print(f'Até logo, {restaurant.name_restaurant}!')
                     Utils.sleep(5)
                     self.current_restaurant = None
-                    self.show_main_menu()
+                    self.show_restaurant_menu()
 
                 else:
                     Utils.clear_screen()
@@ -307,3 +334,103 @@ class App:
         print(f'A sua comissão foi alterada para {new_commission}%.')
         Utils.sleep(5)
         self.show_restaurant_pannel(restaurant)
+        
+        
+        
+#############################################################################
+
+
+
+    def show_client_menu(self):
+        Utils.clear_screen()
+        while True:
+            print('-- Área Cliente --')
+            print('1. Cadastrar')
+            print('2. Login')
+            print('3. Voltar')
+
+            res = input('Escolha uma opção: ')
+
+            if res == '1':
+                Utils.clear_screen()
+                self.show_client_register_menu() #criar
+                break
+            elif res == '2':
+                Utils.clear_screen()
+                self.show_client_login_menu() #criar
+                break
+            elif res == '3':
+                Utils.clear_screen()
+                self.show_area_menu()
+                break
+            else:
+                Utils.clear_screen()
+                print('Esta opção não é valida, digite um dos números acima.')
+                
+                
+                
+    def show_client_register_menu(self):
+        """ Abre menu para registro do cliente. (self)"""
+        Utils.clear_screen()
+        print('-- Registre-se --')
+
+        name_client = ''
+        while not Client.verify_name_client(name_client): #criar funcao verify nome cliente e classe Client
+            print('*Nome deve conter pelo menos 10 caracteres.')
+            name_client = Utils.str_no_digit_input('Nome do restaurante: ')
+
+        email = ''
+        while not Client.verify_email(email): #criar funcao verify email
+            print('*Deve ser um email válido.')
+            email = input('Email: ').lower()
+
+        password = ''
+        while not Client.verify_password(password): #criar fincao verify password
+            print('*Deve conter ao menos uma letra maiúscila, uma minúscula e um número.')
+            password = input('Senha: ')
+            
+        app = DB("example.db")    
+        if not DB.verify_existing_email(app, email): #adicionar consulta para db de client
+            register_client = Client(pk=None, name_client=name_client, email=email, password=password, last_login=None)
+            
+            app = DB("example.db")
+            DB.create_client(app, register_client) #criar no db.py funcao p criar cliente
+            Utils.clear_screen()
+            print(f'{name_client} foi registrado!')
+            Utils.sleep(5)
+            self.show_client_menu()
+        else:
+            Utils.clear_screen()
+            print(f'Este email já está em uso.')
+            Utils.sleep(5)
+            self.show_client_menu()
+    
+    def show_client_login_menu(self):
+        """ Abre menu para login do cliente.(self)"""
+        Utils.clear_screen()
+
+        print('-- Login --')
+        email = input('Email: ').lower()
+        password = input('Senha: ')
+        client = self.db.login(email=email, password=password) #mudar o nome da funcao p login_restaurant e criar uma para ser usada neste, login_client
+        
+        if client is None: #se login estiver incorreto ou nao existir
+            print('Credenciais inválidas. Não possui cadastro? Registre-se agora mesmo!')
+            Utils.sleep(5)
+            Utils.clear_screen()
+            self.show_client_menu()
+        else:
+            self.current_client = client
+            
+            app = DB("example.db")
+            current_date_login = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
+            last_login = DB.pull_last_login(app, client.pk) #mudar nome função e fazer nova p consulta do login do cliente
+            
+            Utils.clear_screen()
+            print(f'Bem vindo, {client.name_client} seu ID é {client.pk}.')
+            print(f'Último login: {last_login[0]}') # verificar indice
+            Utils.sleep(10)
+            
+            DB.push_current_login(app, current_date_login, client.pk) #renomear e criar p client
+            
+            self.show_client_pannel(client) #criar essa funcao!!!!

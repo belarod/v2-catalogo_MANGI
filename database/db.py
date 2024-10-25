@@ -21,7 +21,7 @@ class DB:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name_restaurant TEXT NOT NULL,
                 commission INT NOT NULL,
-                email TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 last_login TEXT DEFAULT 'Este é seu primeiro login!'
             )
@@ -34,6 +34,27 @@ class DB:
                 price INT NOT NULL,
                 fk_id_restaurant INT NOT NULL,
                 FOREIGN KEY (fk_id_restaurant) REFERENCES restaurant(id) 
+            )
+            ''')
+        
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS client (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name_client TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL,
+                last_login TEXT DEFAULT 'Este é seu primeiro login!'
+            )
+            ''')
+        
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS client_order (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fk_product INT,
+                fk_client INT,
+
+                FOREIGN KEY (fk_product) REFERENCES product(id),
+                FOREIGN KEY (fk_client) REFERENCES client(id)
             )
             ''')
 
