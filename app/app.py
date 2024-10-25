@@ -153,14 +153,14 @@ class App:
             
             app = DB("example.db")
             current_date_login = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
-            last_login = DB.pull_last_login(app, restaurant.pk)
+            last_login = DB.pull_last_login_restaurant(app, restaurant.pk)
             
             Utils.clear_screen()
             print(f'Bem vindo, {restaurant.name_restaurant} seu ID é {restaurant.pk} e a comissão {restaurant.commission}%.')
             print(f'Último login: {last_login[0]}')
             Utils.sleep(10)
             
-            DB.push_current_login(app, current_date_login, restaurant.pk)
+            DB.push_current_login_restaurant(app, current_date_login, restaurant.pk)
             
             self.show_restaurant_pannel(restaurant)
 
@@ -425,23 +425,47 @@ class App:
             
             app = DB("example.db")
             current_date_login = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
-            last_login = DB.pull_last_login(app, client.pk) #mudar nome função e fazer nova p consulta do login do cliente
+            last_login = DB.pull_last_login_client(app, client.pk) #mudar nome função e fazer nova p consulta do login do cliente
             
             Utils.clear_screen()
             print(f'Bem vindo, {client.name_client}!')
-            print(f'Último login: {last_login[0]}') # verificar indice
+            print(f'Último login: {last_login[0]}')
             Utils.sleep(10)
             
-            DB.push_current_login_restaurant(app, current_date_login, client.pk) #renomear e criar p client
+            DB.push_current_login_client(app, current_date_login, client.pk) #renomear e criar p client
             
-            self.show_client_pannel(client) #criar essa funcao!!!!
+            self.show_client_pannel() 
             
-    def show_client_pannel(self, client: Client):
+    def show_client_pannel(self):
         Utils.clear_screen()
         app = DB("example.db")
         
         print(f'-- Restaurantes --')
         restaurants_catalog = DB.show_restaurants_catalog(app)
-        print(restaurants_catalog)
+        for restaurant in restaurants_catalog:
+            print(restaurant)
         
         chosen_restaurant = Utils.int_input('Digite o número do restaurante escolhido: ')
+        
+        if DB.verify_existing_restaurant(app, chosen_restaurant):
+            self.show_chosen_restaurant(chosen_restaurant)
+        else:
+            print('Este restaurante não existe, tente novamente.')
+            Utils.sleep(5)
+            Utils.clear_screen()
+            self.show_client_pannel()
+            
+    def show_chosen_restaurant(self, chosen_restaurant: int):
+        '''chosen_restaurant guarda o id p acessar o restaurante selecionado'''
+        Utils.clear_screen()
+        app = DB("example.db")
+        restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
+        
+        print(f'-- Produtos {restaurant} --')
+        product_list = DB.show_products(app, chosen_restaurant)
+        
+        if product_list is None:
+            print('Este restaurante ainda não possui cardápio.')
+        else:
+            for product in product_list:
+                print(f'-- ID: {product.pk:<5} -- {product.name_product:<20} -- Preço: {product.price/100:.2f}')

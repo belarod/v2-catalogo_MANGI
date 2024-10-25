@@ -259,7 +259,22 @@ class DB:
         
         
         
-    def pull_last_login(self, pk: int):
+    def push_current_login_client(self, current_date_login: str, pk: int):
+        """ Insere no DB data/hora em que foi acessado. (self, current_date_login: str, pk: int)"""
+        cur = self.connection.cursor()
+        
+        cur.execute('''
+                UPDATE restaurant
+                SET last_login = ?
+                WHERE id = ?
+                ''', (current_date_login, pk))
+        
+        self.connection.commit()
+        cur.close()
+        
+        
+        
+    def pull_last_login_restaurant(self, pk: int):
         """ Consulta no DB, ÚLTIMA data/hora em que foi acessado. (self, pk: int)"""
         cur = self.connection.cursor()
         
@@ -272,7 +287,22 @@ class DB:
         last_login = cur.fetchone()
         cur.close()
         return last_login
-
+    
+    
+    
+    def pull_last_login_client(self, pk: int):
+        """ Consulta no DB, ÚLTIMA data/hora em que foi acessado. (self, pk: int)"""
+        cur = self.connection.cursor()
+        
+        cur.execute('''
+                SELECT last_login
+                FROM client
+                WHERE id = ?
+                ''', (pk,))
+        
+        last_login = cur.fetchone()
+        cur.close()
+        return last_login
 
 
     def verify_existing_email_restaurant(self, email: str):
@@ -330,19 +360,60 @@ class DB:
             return True
         return False
     
+    def verify_existing_restaurant(self, chosen_restaurant: int):
+        cur = self.connection.cursor()
+    
+        cur.execute('''
+                        SELECT id
+                        FROM restaurant
+                        WHERE id = ?
+                        ''', (chosen_restaurant,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        if record is None:
+            return False
+        return True
+    
     def show_restaurants_catalog(self):
         
         cur = self.connection.cursor()
     
         cur.execute('''
-                        SELECT id, name_restaurant
+                        SELECT id, name_restaurant, commission
                         FROM restaurant
+                        ORDER BY commission DESC
                         ''')
     
         records = cur.fetchall()
         cur.close()
         
-        if records:
-            formatted_list = "\n".join(f"{record[0]}. {record[1]}" for record in records)
-            
-        return formatted_list
+        formatted_list = []
+        for i in range(len(records)):
+            record = records[i]
+            if i == 0:
+                formatted_list.append(f"{record[0]}. {record[1]} 🌟🌟🌟")  
+            elif i == 1:
+                formatted_list.append(f"{record[0]}. {record[1]} 🌟🌟")     
+            elif i == 2:
+                formatted_list.append(f"{record[0]}. {record[1]} 🌟")        
+            else:
+                formatted_list.append(f"{record[0]}. {record[1]}")          
+
+        return formatted_list  
+
+
+
+    def pull_chosen_restaurant(self, chosen_restaurant: int):
+        cur = self.connection.cursor()
+
+        cur.execute('''
+                SELECT name_restaurant
+                FROM restaurant
+                WHERE id = ?
+                ''',(chosen_restaurant,))
+        record = cur.fetchone()
+        cur.close()
+        
+        return record[0] if record else None
