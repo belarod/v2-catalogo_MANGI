@@ -439,9 +439,10 @@ class App:
             
             DB.push_current_login_client(app, current_date_login, client.pk)
             
-            self.show_client_pannel() 
+            self.show_client_pannel(client) 
             
-    def show_client_pannel(self):
+    def show_client_pannel(self, client):
+        self.current_client = client
         Utils.clear_screen()
         app = DB("example.db")
         
@@ -468,7 +469,7 @@ class App:
             self.show_area_menu()
             
         if DB.verify_existing_restaurant(app, chosen_restaurant):
-            self.show_chosen_restaurant(chosen_restaurant, self.kart)
+            self.show_chosen_restaurant(chosen_restaurant, self.kart, client)
             
         else:
             print('Este restaurante não existe, tente novamente.')
@@ -476,7 +477,7 @@ class App:
             Utils.clear_screen()
             self.show_client_pannel()
             
-    def show_chosen_restaurant(self, chosen_restaurant: int, kart: LinkedList | None):
+    def show_chosen_restaurant(self, chosen_restaurant: int, kart: LinkedList | None, client):
         '''chosen_restaurant guarda o id p acessar o restaurante selecionado'''
         
         while True:
@@ -534,7 +535,9 @@ class App:
                     print('Finalizando seu pedido...')
                     Utils.sleep(5)
                     Utils.clear_screen()
-                    self.finalize_order()#####################
+                    kart_array = kart.get_array()
+                    self.current_client = client
+                    self.finalize_order(chosen_restaurant, kart_array, client)
                 
             elif res.isdigit():    
                 if DB.verify_existing_product(app, res, chosen_restaurant):
@@ -574,5 +577,27 @@ class App:
                     
             Utils.clear_screen()
             
-    def finalize_order(self, chosen_restaurant: int, kart_array):
-                pass
+    def finalize_order(self, chosen_restaurant, kart_array, client):
+        order_number = Utils.generate_unique_order_number()
+        self.current_client = client
+        app = DB("example.db")
+        restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
+        
+        for product in kart_array:
+            client_order = Client_order(order_number, client.pk, product)#
+            
+            print(order_number)
+            print(client.pk)
+            print(product)
+            
+            DB.create_order(app, client_order)
+            
+        print('Pedido finalizado com sucesso!')
+        print('------------------------------')
+        print(f'Restaurante: {restaurant}')
+        
+        products_from_order = DB.get_products_from_order(order_number)
+        for product in products_from_order:
+            print(product[0])
+        else:
+            print("Nenhum produto encontrado para o pedido especificado.")

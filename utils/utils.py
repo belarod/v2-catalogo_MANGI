@@ -1,5 +1,6 @@
 import os
 import time
+import uuid
 
 class Utils:
     
@@ -61,3 +62,7 @@ class Utils:
                 return user_input
             else:
                 print("Entrada inválida! Por favor, insira um número ou 'A' ou 'F'.")
+                
+    @staticmethod
+    def generate_unique_order_number():
+        return str(uuid.uuid4())

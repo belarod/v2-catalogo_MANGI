@@ -1,9 +1,9 @@
 class Client_order:
     def __init__(self,
-                 pk: int | None,
-                 fk_product: int,
-                 fk_client: int
+                 order: str, #order_number
+                 fk_client: int,
+                 fk_product: int
                  ):
-        self.pk = pk
-        self.fk_product = fk_product
+        self.order = order
         self.fk_client = fk_client
+        self.fk_product = fk_product

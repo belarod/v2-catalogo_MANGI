@@ -50,12 +50,12 @@ class DB:
         
         cur.execute('''
             CREATE TABLE IF NOT EXISTS client_order (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                fk_product INT,
+                order_id TEXT,
                 fk_client INT,
+                fk_product INT,
 
-                FOREIGN KEY (fk_product) REFERENCES product(id),
-                FOREIGN KEY (fk_client) REFERENCES client(id)
+                FOREIGN KEY (fk_client) REFERENCES client(id),
+                FOREIGN KEY (fk_product) REFERENCES product(id)
             )
             ''')
 
@@ -420,3 +420,30 @@ class DB:
         cur.close()
         
         return record[0] if record else None
+    
+    def create_order(self, client_order):
+        """ Cria pedido de acordo com os inputs do app. (self, client_order)"""
+        cur = self.connection.cursor()
+
+        cur.execute('''
+        INSERT INTO client_order (order_id, fk_client, fk_product) VALUES (?, ?, ?)
+        ''', (client_order.order, client_order.fk_client, client_order.fk_product)
+                    )
+
+        self.connection.commit()
+        cur.close()
+        
+    def get_products_from_order(self, order_number: str):
+        cur = self.connection.cursor()
+
+        cur.execute('''
+                SELECT name_product
+                FROM product
+                INNER JOIN client_order ON product.id = client_order.fk_product
+                WHERE client_order.order_id = ?
+                ''', (order_number,))
+        
+        records = cur.fetchall()
+        cur.close()
+        
+        return [record[0] for record in records]
