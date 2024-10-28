@@ -480,6 +480,7 @@ class App:
         '''chosen_restaurant guarda o id p acessar o restaurante selecionado'''
         
         while True:
+            kart_array = kart.get_array()
             app = DB("example.db")
             restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
             
@@ -492,7 +493,10 @@ class App:
         
             print(('-- Seu carrinho --'))
             if len(kart) == 0:
+                print('--> Ainda não há nada no seu carrinho.') 
+            elif len(kart) >= 20:
                 print('--> Ainda não há nada no seu carrinho.')
+                print(kart)               
             else:
                 print(kart)
                 
@@ -524,20 +528,44 @@ class App:
                     print('--> Ainda não há nada no seu carrinho.')
                     Utils.sleep(5)
                     Utils.clear_screen()
-                    break
+                    continue
                 else:
-                    ##adicionar finalizacao aqui
-                    pass
-                
-            elif res.isdigit():
-                if DB.verify_existing_product(app, res, chosen_restaurant):
-                    kart.add(res)
-                    
                     Utils.clear_screen()
-                    print(f'O produto de ID {res} foi adicionado ao seu carrinho!')
-                    print(self.kart)
+                    print('Finalizando seu pedido...')
                     Utils.sleep(5)
                     Utils.clear_screen()
+                    self.finalize_order()#####################
+                
+            elif res.isdigit():    
+                if DB.verify_existing_product(app, res, chosen_restaurant):
+                    quantity = Utils.int_input('Quantidade:\n')
+                    if quantity + len(kart) > 20:
+                        total_minus_orders_made = 20 - len(kart)
+                        print(f'Você está adicionando muitos itens! Máximo de 20 itens por pedido, podendo adicionar mais {total_minus_orders_made} produtos.')
+                        Utils.sleep(5)
+                        #Utils.clear_screen()
+                        continue
+                    elif quantity == 0:
+                        if res not in kart_array:
+                            print(f'O produto de ID {res} produto não existe no seu carrinho.')
+                            Utils.sleep(5)
+                            #Utils.clear_screen()
+                        else:
+                            while res in kart_array:
+                                kart.remove(res)
+                                kart_array = kart.get_array()
+                                
+                            Utils.clear_screen()
+                            print(f'Produto de ID {res} foi removido do seu carrinho.')
+                            Utils.sleep(5)
+                    elif quantity > 0:
+                        for _ in range(quantity):
+                            kart.add(res)
+                        Utils.clear_screen()
+                        print(f'O produto de ID {res} foi adicionado ao seu carrinho {quantity} vezes!')
+                        Utils.sleep(5)
+                        #Utils.clear_screen()
+                    
                 else:
                     Utils.clear_screen()
                     print(f"Não existe produto de ID:{res}. Digite um ID existente.")
@@ -545,4 +573,6 @@ class App:
                     Utils.clear_screen()
                     
             Utils.clear_screen()
-            self.show_chosen_restaurant(chosen_restaurant, self.kart)
+            
+    def finalize_order(self, chosen_restaurant: int, kart_array):
+                pass
