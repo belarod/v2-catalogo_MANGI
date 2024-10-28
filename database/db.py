@@ -264,7 +264,7 @@ class DB:
         cur = self.connection.cursor()
         
         cur.execute('''
-                UPDATE restaurant
+                UPDATE client
                 SET last_login = ?
                 WHERE id = ?
                 ''', (current_date_login, pk))
@@ -343,15 +343,15 @@ class DB:
     
     
     
-    def verify_existing_product(self, pk: str):
-        """ Consulta no DB se já existe o parâmetro (email) cadastrado. Retorna True, se não existe, False, se já existe. (self, pk: str)"""
+    def verify_existing_product(self, pk_product: int, pk_restaurant: int):
+        """ Consulta no DB se já existe o parâmetro (produto) cadastrado. Retorna True, se não existe, False, se já existe. (self, pk: str)"""
         cur = self.connection.cursor()
     
         cur.execute('''
                         SELECT id
                         FROM product
-                        WHERE fk_id_restaurant = ?
-                        ''', (pk,))
+                        WHERE id = ? AND fk_id_restaurant = ?
+                        ''', (pk_product, pk_restaurant))
     
         record = cur.fetchone()
         cur.close()

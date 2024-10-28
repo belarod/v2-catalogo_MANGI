@@ -50,3 +50,14 @@ class Utils:
             os.system(f"timeout {seconds}")
         else:
             pass
+        
+    @staticmethod
+    def get_user_choice():
+        """ Solicita ao usuário que digite 'A', 'F' ou um ID de produto """
+        while True:
+            user_input = input().strip().lower()
+
+            if user_input.isdigit() or user_input in ['a', 'f']:
+                return user_input
+            else:
+                print("Entrada inválida! Por favor, insira um número ou 'A' ou 'F'.")

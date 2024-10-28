@@ -1,12 +1,13 @@
 import time
-from multiprocessing.resource_tracker import register
+#from multiprocessing.resource_tracker import register
 from database.db import DB
+from utils.utils import Utils
 
 from models.product import Product
 from models.restaurant import Restaurant
 from models.client import Client
+from models.linked_list import Node, LinkedList
 from models.client_order import Client_order
-from utils.utils import Utils
 
 #inicia app
 class App:
@@ -24,7 +25,9 @@ class App:
         if not self._initialized:
             self.db = db
             self.current_restaurant = None
+            self.current_client = None
             self._initialized = True
+            self.kart = LinkedList()
 
 
 
@@ -35,6 +38,7 @@ class App:
     
     
     def show_area_menu(self):
+        Utils.clear_screen()
         while True:
             print('-- Tela Inicial --')
             print('1. Área Restaurante')
@@ -48,7 +52,7 @@ class App:
                 break
             elif res == '2':
                 Utils.clear_screen()
-                self.show_client_menu() #falta criar
+                self.show_client_menu()
                 break
             else:
                 Utils.clear_screen()
@@ -189,7 +193,7 @@ class App:
             print('Este restaurante ainda não possui cardápio.')
             while True:
                 print('1. Cadastrar produto')
-                print(f'2. Alterar comissão (Atual: {current_commission})')
+                print(f'2. Alterar comissão (Atual: {current_commission})%')
                 print('3. Logout')
 
                 res = input('Escolha uma opção: ')
@@ -210,6 +214,7 @@ class App:
                     Utils.sleep(5)
                     self.current_restaurant = None
                     self.show_area_menu()
+                    break
 
                 else:
                     Utils.clear_screen()
@@ -219,14 +224,14 @@ class App:
             for product in product_list:
                 print(f'-- {product.name_product:<20} -- ID: {product.pk:<5} -- Preço: {product.price/100:.2f}')
             while True:
+                
+                self.current_restaurant = restaurant
                 print('1. Cadastrar produto')
                 print('2. Apagar produto')
                 print(f'3. Alterar comissão -- atual: {current_commission}%')
                 print('4. Logout')
 
                 res = input('Escolha uma opção: ')
-                
-                self.current_restaurant = restaurant
                 
                 if res == '1':
                     Utils.clear_screen()
@@ -245,7 +250,7 @@ class App:
                     print(f'Até logo, {restaurant.name_restaurant}!')
                     Utils.sleep(5)
                     self.current_restaurant = None
-                    self.show_restaurant_menu()
+                    self.show_area_menu()
 
                 else:
                     Utils.clear_screen()
@@ -425,14 +430,14 @@ class App:
             
             app = DB("example.db")
             current_date_login = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
-            last_login = DB.pull_last_login_client(app, client.pk) #mudar nome função e fazer nova p consulta do login do cliente
+            last_login = DB.pull_last_login_client(app, client.pk)
             
             Utils.clear_screen()
             print(f'Bem vindo, {client.name_client}!')
             print(f'Último login: {last_login[0]}')
             Utils.sleep(10)
             
-            DB.push_current_login_client(app, current_date_login, client.pk) #renomear e criar p client
+            DB.push_current_login_client(app, current_date_login, client.pk)
             
             self.show_client_pannel() 
             
@@ -452,8 +457,8 @@ class App:
             
         for restaurant in restaurants_catalog:
             print(restaurant)
+            
         print('0. Logout')
-        
         chosen_restaurant = Utils.int_input('Digite o número do restaurante escolhido: ')
         
         if chosen_restaurant == 0:
@@ -463,24 +468,81 @@ class App:
             self.show_area_menu()
             
         if DB.verify_existing_restaurant(app, chosen_restaurant):
-            self.show_chosen_restaurant(chosen_restaurant)
+            self.show_chosen_restaurant(chosen_restaurant, self.kart)
+            
         else:
             print('Este restaurante não existe, tente novamente.')
             Utils.sleep(5)
             Utils.clear_screen()
             self.show_client_pannel()
             
-    def show_chosen_restaurant(self, chosen_restaurant: int):
+    def show_chosen_restaurant(self, chosen_restaurant: int, kart: LinkedList | None):
         '''chosen_restaurant guarda o id p acessar o restaurante selecionado'''
-        Utils.clear_screen()
-        app = DB("example.db")
-        restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
         
-        print(f'-- Produtos {restaurant} --')
-        product_list = DB.show_products(app, chosen_restaurant)
+        while True:
+            app = DB("example.db")
+            restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
+            
+            Utils.clear_screen()
+            print('-----------------------------------')
+            print('Digite A - Abandonar compra')
+            print('Digite F - Finalizar compra')
+            print('Digite o ID do produto desejado')
+            print('-----------------------------------')
         
-        if product_list is None:
-            print('Este restaurante ainda não possui cardápio.')
-        else:
-            for product in product_list:
-                print(f'-- ID: {product.pk:<5} -- {product.name_product:<20} -- Preço: {product.price/100:.2f}')
+            print(('-- Seu carrinho --'))
+            if len(kart) == 0:
+                print('--> Ainda não há nada no seu carrinho.')
+            else:
+                print(kart)
+                
+            print('-----------------------------------')
+            print(f'-- Produtos {restaurant} --')
+            product_list = DB.show_products(app, chosen_restaurant)
+            
+            if product_list is None:
+                print('Este restaurante ainda não possui cardápio.')
+            else:
+                for product in product_list:
+                    print(f'-- ID: {product.pk:<5} -- {product.name_product:<20} -- Preço: {product.price/100:.2f}')
+            
+            res = Utils.get_user_choice()
+            if res == 'a':
+                kart.clear()
+                chosen_restaurant = None
+                
+                Utils.clear_screen()
+                print('Volte sempre!')
+                Utils.sleep(5)
+                Utils.clear_screen()
+                self.show_client_pannel()
+                break
+            
+            elif res == 'f':
+                if len(kart) == 0:
+                    Utils.clear_screen()
+                    print('--> Ainda não há nada no seu carrinho.')
+                    Utils.sleep(5)
+                    Utils.clear_screen()
+                    break
+                else:
+                    ##adicionar finalizacao aqui
+                    pass
+                
+            elif res.isdigit():
+                if DB.verify_existing_product(app, res, chosen_restaurant):
+                    kart.add(res)
+                    
+                    Utils.clear_screen()
+                    print(f'O produto de ID {res} foi adicionado ao seu carrinho!')
+                    print(self.kart)
+                    Utils.sleep(5)
+                    Utils.clear_screen()
+                else:
+                    Utils.clear_screen()
+                    print(f"Não existe produto de ID:{res}. Digite um ID existente.")
+                    Utils.sleep(5)
+                    Utils.clear_screen()
+                    
+            Utils.clear_screen()
+            self.show_chosen_restaurant(chosen_restaurant, self.kart)
