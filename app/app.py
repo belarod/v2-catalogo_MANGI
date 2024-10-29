@@ -494,10 +494,7 @@ class App:
         
             print(('-- Seu carrinho --'))
             if len(kart) == 0:
-                print('--> Ainda não há nada no seu carrinho.') 
-            elif len(kart) >= 20:
-                print('--> Ainda não há nada no seu carrinho.')
-                print(kart)               
+                print('--> Ainda não há nada no seu carrinho.')             
             else:
                 print(kart)
                 
@@ -559,22 +556,21 @@ class App:
                     print(f"Não existe produto de ID:{res}. Digite um ID existente.")
                     Utils.sleep(5)
                     Utils.clear_screen()
-                    
-            Utils.clear_screen()
             
     def finalize_order(self, chosen_restaurant, kart_array, client):
         order_number = Utils.generate_unique_order_number()
         self.current_client = client
         app = DB("example.db")
         
+        
         for product, quantity in kart_array:
             client_order = Client_order(order_number, client.pk, product, quantity)#
             
             DB.create_order(app, client_order)
-            self.finalized_order(chosen_restaurant, client, order_number)
             
-    def finalized_order(self, chosen_restaurant, client, order_number):
-        Utils.clear_screen()
+        self.resume_order(chosen_restaurant, client, order_number)
+            
+    def resume_order(self, chosen_restaurant, client, order_number):
         app = DB("example.db")
         restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
         
@@ -591,12 +587,10 @@ class App:
             quantity = DB.get_product_quantity(app, product_id, order_number)
             
             total_price += product_price * quantity
+            print(f'Produto: {product_name}, Preço: R${product_price / 100:.2f}, Quantidade: {quantity}')
             
-            if quantity is not None:
-                total_price += product_price * quantity
-                print(f'Produto: {product_name}, Preço: R${product_price / 100:.2f}, Quantidade: {quantity}')
-            
-            
-            
-        print(quantity)
         print(f'TOTAL: R${total_price / 100:.2f}')
+        chosen_restaurant = None
+        self.kart.clear()
+        input('Pressione alguma tecla para prosseguir.')
+        self.show_client_pannel(client)
