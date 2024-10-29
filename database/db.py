@@ -54,6 +54,7 @@ class DB:
                 fk_client INT,
                 fk_product INT,
                 quantity INT,
+                date_order TEXT,
 
                 FOREIGN KEY (fk_client) REFERENCES client(id),
                 FOREIGN KEY (fk_product) REFERENCES product(id)
@@ -464,3 +465,17 @@ class DB:
         if record is not None:
             return record[0]
         return None
+    
+    def push_current_login_restaurant(self, date_order, fk_product, order_number):
+        """ Insere no DB data/hora em que foi acessado. (self, current_date_login: str, pk: int)"""
+        cur = self.connection.cursor()
+        
+        cur.execute('''
+                UPDATE client_order
+                SET date_order = ?
+                WHERE fk_product = ? AND order_id = ?
+                ''', (date_order, fk_product, order_number))
+        
+        self.connection.commit()
+        cur.close()
+        

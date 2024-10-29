@@ -6,7 +6,7 @@ from utils.utils import Utils
 from models.product import Product
 from models.restaurant import Restaurant
 from models.client import Client
-from models.linked_list import Node, LinkedList
+from models.linked_list import LinkedList
 from models.client_order import Client_order
 
 #inicia app
@@ -411,6 +411,8 @@ class App:
             Utils.sleep(5)
             self.show_client_menu()
     
+    
+    
     def show_client_login_menu(self):
         """ Abre menu para login do cliente.(self)"""
         Utils.clear_screen()
@@ -440,6 +442,8 @@ class App:
             DB.push_current_login_client(app, current_date_login, client.pk)
             
             self.show_client_pannel(client) 
+            
+            
             
     def show_client_pannel(self, client):
         self.current_client = client
@@ -476,6 +480,8 @@ class App:
             Utils.sleep(5)
             Utils.clear_screen()
             self.show_client_pannel(client)
+            
+            
             
     def show_chosen_restaurant(self, chosen_restaurant: int, kart: LinkedList | None, client):
         '''chosen_restaurant guarda o id p acessar o restaurante selecionado'''
@@ -557,8 +563,11 @@ class App:
                     Utils.sleep(5)
                     Utils.clear_screen()
             
+            
+            
     def finalize_order(self, chosen_restaurant, kart_array, client):
         order_number = Utils.generate_unique_order_number()
+        current_date_login = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
         self.current_client = client
         app = DB("example.db")
         
@@ -567,16 +576,20 @@ class App:
             client_order = Client_order(order_number, client.pk, product, quantity)#
             
             DB.create_order(app, client_order)
+            DB.push_current_login_restaurant(app, current_date_login, product, order_number)
             
         self.resume_order(chosen_restaurant, client, order_number)
+            
+            
             
     def resume_order(self, chosen_restaurant, client, order_number):
         app = DB("example.db")
         restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
         
         print(f'Pedido finalizado com sucesso!\nObrigado pela preferência {client.name_client}.')
-        print('------------------------------')
         print(f'Restaurante: {restaurant}')
+        print(f"{'Produto':<20} {'Preço (R$)':>15} {'Quantidade':>12}")
+        print('-' * 50)
            
         total_price = 0
         products_from_order = DB.get_products_from_order(app, order_number)
@@ -587,9 +600,13 @@ class App:
             quantity = DB.get_product_quantity(app, product_id, order_number)
             
             total_price += product_price * quantity
-            print(f'Produto: {product_name}, Preço: R${product_price / 100:.2f}, Quantidade: {quantity}')
-            
-        print(f'TOTAL: R${total_price / 100:.2f}')
+            print(f"{product_name:<20} {product_price / 100:>15.2f} {quantity:>12}")
+        
+        print('-' * 50)    
+        print(f"{'TOTAL':<20} {total_price / 100:>15.2f}")
+        print('-' * 50) 
+        print(f'ID do deu pedido: {order_number}')   
+        
         chosen_restaurant = None
         self.kart.clear()
         input('Pressione alguma tecla para prosseguir.')
