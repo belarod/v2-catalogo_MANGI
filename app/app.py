@@ -475,7 +475,7 @@ class App:
             print('Este restaurante não existe, tente novamente.')
             Utils.sleep(5)
             Utils.clear_screen()
-            self.show_client_pannel()
+            self.show_client_pannel(client)
             
     def show_chosen_restaurant(self, chosen_restaurant: int, kart: LinkedList | None, client):
         '''chosen_restaurant guarda o id p acessar o restaurante selecionado'''
@@ -520,7 +520,7 @@ class App:
                 print('Volte sempre!')
                 Utils.sleep(5)
                 Utils.clear_screen()
-                self.show_client_pannel()
+                self.show_client_pannel(client)
                 break
             
             elif res == 'f':
@@ -542,32 +542,17 @@ class App:
             elif res.isdigit():    
                 if DB.verify_existing_product(app, res, chosen_restaurant):
                     quantity = Utils.int_input('Quantidade:\n')
-                    if quantity + len(kart) > 20:
-                        total_minus_orders_made = 20 - len(kart)
-                        print(f'Você está adicionando muitos itens! Máximo de 20 itens por pedido, podendo adicionar mais {total_minus_orders_made} produtos.')
+                    if quantity == 0:
+                        kart.remove(res, quantity=0)
+                                  
+                        Utils.clear_screen()
+                        print(f'Produto de ID {res} foi removido do seu carrinho.')
                         Utils.sleep(5)
-                        #Utils.clear_screen()
-                        continue
-                    elif quantity == 0:
-                        if res not in kart_array:
-                            print(f'O produto de ID {res} produto não existe no seu carrinho.')
-                            Utils.sleep(5)
-                            #Utils.clear_screen()
-                        else:
-                            while res in kart_array:
-                                kart.remove(res)
-                                kart_array = kart.get_array()
-                                
-                            Utils.clear_screen()
-                            print(f'Produto de ID {res} foi removido do seu carrinho.')
-                            Utils.sleep(5)
                     elif quantity > 0:
-                        for _ in range(quantity):
-                            kart.add(res)
+                        kart.add(res, quantity)
                         Utils.clear_screen()
                         print(f'O produto de ID {res} foi adicionado ao seu carrinho {quantity} vezes!')
                         Utils.sleep(5)
-                        #Utils.clear_screen()
                     
                 else:
                     Utils.clear_screen()
@@ -581,23 +566,37 @@ class App:
         order_number = Utils.generate_unique_order_number()
         self.current_client = client
         app = DB("example.db")
-        restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
         
-        for product in kart_array:
-            client_order = Client_order(order_number, client.pk, product)#
-            
-            print(order_number)
-            print(client.pk)
-            print(product)
+        for product, quantity in kart_array:
+            client_order = Client_order(order_number, client.pk, product, quantity)#
             
             DB.create_order(app, client_order)
+            self.finalized_order(chosen_restaurant, client, order_number)
             
-        print('Pedido finalizado com sucesso!')
+    def finalized_order(self, chosen_restaurant, client, order_number):
+        Utils.clear_screen()
+        app = DB("example.db")
+        restaurant = DB.pull_chosen_restaurant(app, chosen_restaurant)
+        
+        print(f'Pedido finalizado com sucesso!\nObrigado pela preferência {client.name_client}.')
         print('------------------------------')
         print(f'Restaurante: {restaurant}')
-        
-        products_from_order = DB.get_products_from_order(order_number)
+           
+        total_price = 0
+        products_from_order = DB.get_products_from_order(app, order_number)
         for product in products_from_order:
-            print(product[0])
-        else:
-            print("Nenhum produto encontrado para o pedido especificado.")
+            product_id = product[0]
+            product_name = product[1]
+            product_price = product[2]
+            quantity = DB.get_product_quantity(app, product_id, order_number)
+            
+            total_price += product_price * quantity
+            
+            if quantity is not None:
+                total_price += product_price * quantity
+                print(f'Produto: {product_name}, Preço: R${product_price / 100:.2f}, Quantidade: {quantity}')
+            
+            
+            
+        print(quantity)
+        print(f'TOTAL: R${total_price / 100:.2f}')

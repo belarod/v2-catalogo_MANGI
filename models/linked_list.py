@@ -1,6 +1,7 @@
 class Node:
-    def __init__(self, value):
+    def __init__(self, value,quantity):
         self.value = value
+        self.quantity = quantity
         self.next = None
 
 class LinkedList:
@@ -18,15 +19,15 @@ class LinkedList:
         values = []
         current = self.head
         while current is not None:
-            values.append(str(current.value))
+            values.append(f"{current.value} Qntd: {current.quantity}\n")
             current = current.next
-        return " -> ".join(values)
+        return "".join(values)
         
     def get_array(self):
         array = []
         current = self.head
         while current is not None:
-            array.append(current.value)
+            array.append((current.value, current.quantity))
             current = current.next
         return array
     
@@ -38,28 +39,32 @@ class LinkedList:
             current = current.next
         return count
         
-    def add(self, value):
-        new_node = Node(value)
-        
-        if self.head is None:
-            self.head = new_node
-        else:
-            current = self.head
-            while current.next is not None:
-                current = current.next
-            current.next = new_node
+    def add(self, value, quantity):
+        current = self.head
+        while current is not None:
+            if current.value == value:
+                current.quantity += quantity
+                return
+            current = current.next
             
-    def remove(self, value):
+        new_node = Node(value, quantity)
+        new_node.next = self.head
+        self.head = new_node
+            
+    def remove(self, value, quantity):
         current = self.head
         anterior = None
         
         while current is not None:
             if current.value == value:
-                if anterior is None:
-                    self.head = current.next
+                if current.quantity > quantity:
+                    current.quantity -= quantity
                 else:
-                    anterior.next = current.next
-                return
+                    if anterior is None:
+                        self.head = current.next
+                    else:
+                        anterior.next = current.next
+                    return
             anterior = current
             current = current.next
             

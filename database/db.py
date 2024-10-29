@@ -53,6 +53,7 @@ class DB:
                 order_id TEXT,
                 fk_client INT,
                 fk_product INT,
+                quantity INT,
 
                 FOREIGN KEY (fk_client) REFERENCES client(id),
                 FOREIGN KEY (fk_product) REFERENCES product(id)
@@ -426,8 +427,8 @@ class DB:
         cur = self.connection.cursor()
 
         cur.execute('''
-        INSERT INTO client_order (order_id, fk_client, fk_product) VALUES (?, ?, ?)
-        ''', (client_order.order, client_order.fk_client, client_order.fk_product)
+        INSERT INTO client_order (order_id, fk_client, fk_product, quantity) VALUES (?, ?, ?, ?)
+        ''', (client_order.order, client_order.fk_client, client_order.fk_product, client_order.quantity)
                     )
 
         self.connection.commit()
@@ -437,13 +438,29 @@ class DB:
         cur = self.connection.cursor()
 
         cur.execute('''
-                SELECT name_product
-                FROM product
-                INNER JOIN client_order ON product.id = client_order.fk_product
-                WHERE client_order.order_id = ?
-                ''', (order_number,))
+            SELECT fk_product, name_product, price
+            FROM client_order
+            INNER JOIN product ON client_order.fk_product = product.id
+            WHERE client_order.order_id = ?
+        ''', (order_number,))
         
         records = cur.fetchall()
         cur.close()
         
-        return [record[0] for record in records]
+        return records
+    
+    def get_product_quantity(self, fk_product: int, order_number: str):
+        cur = self.connection.cursor()
+    
+        cur.execute('''
+                        SELECT quantity
+                        FROM client_order
+                        WHERE fk_product = ? AND order_id = ?
+                        ''', (fk_product, order_number))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        if record is not None:
+            return record[0]
+        return None
