@@ -576,7 +576,7 @@ class App:
             client_order = Client_order(order_number, client.pk, product, quantity)#
             
             DB.create_order(app, client_order)
-            DB.push_current_login_restaurant(app, current_date_login, product, order_number)
+            DB.push_current_date_order(app, current_date_login, product, order_number)
             
         self.resume_order(chosen_restaurant, client, order_number)
             
