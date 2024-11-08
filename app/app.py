@@ -328,13 +328,16 @@ class App:
         app = DB("example.db")
         DB.show_highest_commission(app) 
         
-        new_commission = 0
         pk = restaurant.pk
-        while not int(new_commission) and Restaurant.verify_commission(new_commission):
+        while True:
             print('Em porcentagem, de 0 a 100.')
-            
             print(f'Atual: {restaurant.commission}%')
+            
             new_commission = Utils.int_input('Comissão (em porcentagem): ')
+            if new_commission < 0:
+                print("Não é permitido um número negativo. Tente novamente.")
+            elif Restaurant.verify_commission(new_commission):
+                break
             
         DB.alter_commission(app, pk, new_commission)
         Utils.clear_screen()
