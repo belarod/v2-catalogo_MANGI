@@ -15,6 +15,11 @@ class Utils:
                 value = input(msg)
                 result = int(value)
                 valid_option = True
+                
+                if result < 0:
+                    valid_option = False
+                else:
+                    valid_option = True
             except:
                 print('Deve ser um número inteiro, tente novamente.')
         return result

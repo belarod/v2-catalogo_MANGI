@@ -466,7 +466,7 @@ class DB:
             return record[0]
         return None
     
-    def push_current_login_restaurant(self, date_order, fk_product, order_number):
+    def push_current_date_order(self, date_order, fk_product, order_number):
         """ Insere no DB data/hora em que foi acessado. (self, current_date_login: str, pk: int)"""
         cur = self.connection.cursor()
         
