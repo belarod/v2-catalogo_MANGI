@@ -55,6 +55,7 @@ class DB:
                 fk_product INT,
                 quantity INT,
                 date_order TEXT,
+                status INT,
 
                 FOREIGN KEY (fk_client) REFERENCES client(id),
                 FOREIGN KEY (fk_product) REFERENCES product(id)
