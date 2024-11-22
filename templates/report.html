@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANGI</title>
+</head>
+<body>
+    <form action="{{ url_for('logout') }}" method="GET">
+        <button type="submit">LOGOUT</button>
+    </form>
+    <form action="{{ url_for('order_pannel') }}" method="GET">
+        <button type="submit">PEDIDOS</button>
+    </form>
+</body>
+</html>

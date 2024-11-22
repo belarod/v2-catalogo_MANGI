@@ -68,11 +68,17 @@ def order_pannel():
                "status": status
           }
           order_info.append(order_info_dic)
-     return render_template('order_pannel.html', orders=order_info)  
+     return render_template('order_pannel.html', orders=order_info) 
+
+@appFlask.route('/logout', methods=['GET', 'POST'])
+def logout():
+     session.pop('email', None)
+     return redirect(url_for('index'))
+
+@appFlask.route('/report', methods=['GET', 'POST'])
+def report():
+     return render_template('report.html') 
            
-@appFlask.route('/order_pannel/<order_id>', methods=['GET', 'POST'])
-def pedidos():
-     pass
 
 if __name__ == '__main__':
     appFlask.run(debug=True) 
