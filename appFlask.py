@@ -36,6 +36,11 @@ def login():
 @appFlask.route('/order_pannel', methods=['GET', 'POST'])
 def order_pannel():
      orders = DB.get_orders_id(my_db, session['pk'])
+     for order in orders:
+          products = DB.get_products_from_order(my_db, order)
+          for product in products:
+               product_name = product[1]
+               
      
      return render_template('order_pannel.html')  
            
