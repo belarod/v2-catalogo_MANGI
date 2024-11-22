@@ -9,35 +9,36 @@
     <h1>Pedidos</h1>
     <ul>
         {% for order in orders %}
-            <li>
-                <p>PEDIDO {{ order.order_id[:5] }}:</p> {#mostra apenas os 5 primeiros caracteres(UUID comprido tava poluíndo muito a tela)**/#}
-                <p>CLIENTE {{order.client}}</p>
-                <p>STATUS: {{order.status}}</p>
-                <ul>
-                    {% for product in order.product_details %}
-                        <li>{{ product.name }} - {{ product.quantity }}</li>
-                    {% endfor %}
+            {% if order.status != 3 and order.status != 4 %}
+                <li>
+                    <p>PEDIDO {{ order.order_id[:5] }}:</p> {#mostra apenas os 5 primeiros caracteres(UUID comprido tava poluíndo muito a tela)**/#}
+                    <p>CLIENTE {{order.client}}</p>
+                    <p>STATUS: {{order.status}}</p>
+                    <ul>
+                        {% for product in order.product_details %}
+                            <li>{{ product.name }} - {{ product.quantity }}</li>
+                        {% endfor %}
 
-
-
-                    {% if order.status == 0 %}
-                        <p>Criado 0</p>
-                        <button type="submit" name="action">ACEITAR</button>
-                        <button type="submit" name="action">RECUSAR</button>
-                    {% elif order.status == 1 %}
-                        <p>Aceito 1</p>
-                        <button type="submit" name="action">ENTREGA EM ANDAMENTO</button>
-                    {% elif order.status == 2 %}
-                        <p>Saiu p entrega 2</p>
-                        <button type="submit" name="action">ENTREGUE</button>
-                    {% elif order.status == 3 %}
-                        <p>Entregue 3 (n devo mostrar)</p>
-                    {% elif order.status == 4 %}
-                        <p>Recusado 4 (n devo mostrar)</p>
-                    {% endif %}
-
-                </ul>
-            </li>
+                        <form method="POST" action="{{ url_for('order_pannel', order_id=order.order_id) }}">
+                            {% if order.status == 0 %}
+                                <p>Criado 0</p>
+                                <button type="submit" name="action" value="accept">ACEITAR</button>
+                                <button type="submit" name="action" value="refuse">RECUSAR</button>
+                            {% elif order.status == 1 %}
+                                <p>Aceito 1</p>
+                                <button type="submit" name="action" value="in_delivery">ENTREGA EM ANDAMENTO</button>
+                            {% elif order.status == 2 %}
+                                <p>Saiu p entrega 2</p>
+                                <button type="submit" name="action" value="delivered">ENTREGUE</button>
+                            {% elif order.status == 3 %}
+                                <p>Entregue 3 (n devo mostrar)</p>
+                            {% elif order.status == 4 %}
+                                <p>Recusado 4 (n devo mostrar)</p>
+                            {% endif %}
+                        </form>
+                    </ul>
+                </li>
+            {% endif %}
         {% endfor %}
     </ul>
 </body>

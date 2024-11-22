@@ -4,12 +4,13 @@ from flask import request
 from flask import session
 from database.db import DB
 from app.app import App
+import os
 
 
 
 my_db = DB('example.db')
 appFlask = Flask(__name__)
-appFlask.secret_key = 'secret'
+appFlask.secret_key = os.urandom(24)
 
 
 
@@ -34,10 +35,29 @@ def login():
      return render_template('login.html') 
 
 @appFlask.route('/order_pannel', methods=['GET', 'POST'])
-def order_pannel():
-     orders_with_details = []
+def order_pannel(order_id):
+     if 'pk' not in session:
+        return redirect(url_for('login'))
      
      orders = DB.get_orders_id_name(my_db, session['pk'])
+     if request.method == 'POST':
+          action = request.form.get('action')
+          
+          if action == 'accept':
+               print('aceito')         
+               return redirect(url_for('order_pannel', order_id=order_id))
+          elif action == 'refuse':
+               print('recusado')
+               return redirect(url_for('order_pannel', order_id=order_id))
+          elif action == 'in_delivery':
+               print('em rota de entrega')
+               return redirect(url_for('order_pannel', order_id=order_id))
+          elif action == 'delivered':
+               print('entregue')
+               return redirect(url_for('order_pannel', order_id=order_id))
+     
+     ####################
+     
      for order in orders:
           order_id = order[0]
           client = order[1]
@@ -49,14 +69,16 @@ def order_pannel():
           product_details = [{"name": product[0], "quantity": product[1]} for product in products]
           
           order_info = {
-            "order_id": order_id,
-            "client": client,
-            "product_details": product_details,
-            "status": status
+               "order_id": order_id,
+               "client": client,
+               "product_details": product_details,
+               "status": status
           }
-          orders_with_details.append(order_info)           
-     
-     return render_template('order_pannel.html', orders=orders_with_details)  
+     return render_template('order_pannel.html', orders=order_info)  
            
+@appFlask.route('/order_pannel/<order_id>', methods=['GET', 'POST'])
+def pedidos():
+     pass
+
 if __name__ == '__main__':
     appFlask.run(debug=True) 
