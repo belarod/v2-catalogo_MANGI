@@ -452,6 +452,21 @@ class DB:
         
         return records
     
+    def get_products_and_quantity_from_order(self, order_number: str):
+        cur = self.connection.cursor()
+
+        cur.execute('''
+            SELECT name_product, quantity
+            FROM client_order
+            INNER JOIN product ON client_order.fk_product = product.id
+            WHERE client_order.order_id = ?
+        ''', (order_number,))
+        
+        records = cur.fetchall()
+        cur.close()
+        
+        return records
+    
     def get_product_quantity(self, fk_product: int, order_number: str):
         cur = self.connection.cursor()
     
@@ -483,15 +498,29 @@ class DB:
         
 #flask usage:
 
-    def get_orders_id(self, fk_restaurant):
+    def get_orders_id_name(self, fk_restaurant):
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT DISTINCT order_id
-                        FROM client_order
-                        WHERE fk_restaurant
+                        SELECT DISTINCT order_id, name_client
+                        FROM client_order AS co
+                        INNER JOIN client c ON c.id = co.fk_client
+                        WHERE fk_restaurant = ?
                         ''', (fk_restaurant,))
     
         records = cur.fetchall()
         cur.close()
         
         return records
+    
+    def get_order_status(self, order_number):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT DISTINCT status
+                        FROM client_order
+                        WHERE order_id = ?
+                        ''', (order_number,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record

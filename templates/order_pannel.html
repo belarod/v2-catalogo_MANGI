@@ -6,6 +6,39 @@
     <title>Document</title>
 </head>
 <body>
-    <p>ORDER PANNEL</p>
+    <h1>Pedidos</h1>
+    <ul>
+        {% for order in orders %}
+            <li>
+                <p>PEDIDO {{ order.order_id[:5] }}:</p> {#mostra apenas os 5 primeiros caracteres(UUID comprido tava poluíndo muito a tela)**/#}
+                <p>CLIENTE {{order.client}}</p>
+                <p>STATUS: {{order.status}}</p>
+                <ul>
+                    {% for product in order.product_details %}
+                        <li>{{ product.name }} - {{ product.quantity }}</li>
+                    {% endfor %}
+
+
+
+                    {% if order.status == 0 %}
+                        <p>Criado 0</p>
+                        <button type="submit" name="action">ACEITAR</button>
+                        <button type="submit" name="action">RECUSAR</button>
+                    {% elif order.status == 1 %}
+                        <p>Aceito 1</p>
+                        <button type="submit" name="action">ENTREGA EM ANDAMENTO</button>
+                    {% elif order.status == 2 %}
+                        <p>Saiu p entrega 2</p>
+                        <button type="submit" name="action">ENTREGUE</button>
+                    {% elif order.status == 3 %}
+                        <p>Entregue 3 (n devo mostrar)</p>
+                    {% elif order.status == 4 %}
+                        <p>Recusado 4 (n devo mostrar)</p>
+                    {% endif %}
+
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
