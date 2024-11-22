@@ -6,6 +6,7 @@ from database.db import DB
 from app.app import App
 
 
+
 my_db = DB('example.db')
 appFlask = Flask(__name__)
 appFlask.secret_key = 'secret'
@@ -26,6 +27,7 @@ def login():
           
           if restaurant is not None:
                session['email'] = request.form['email']
+               session['pk'] = restaurant.pk
                return redirect(url_for('order_pannel'))
           else:
                return render_template('login.html', error="Invalid email or password.")
@@ -33,7 +35,9 @@ def login():
 
 @appFlask.route('/order_pannel', methods=['GET', 'POST'])
 def order_pannel():
+     orders = DB.get_orders_id(my_db, session['pk'])
+     
      return render_template('order_pannel.html')  
            
 if __name__ == '__main__':
-    appFlask.run(debug=True)
+    appFlask.run(debug=True) 

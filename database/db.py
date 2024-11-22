@@ -55,10 +55,12 @@ class DB:
                 fk_product INT,
                 quantity INT,
                 date_order TEXT,
-                status INT,
+                fk_restaurant INT,
+                status INT DEFAULT 0,
 
                 FOREIGN KEY (fk_client) REFERENCES client(id),
-                FOREIGN KEY (fk_product) REFERENCES product(id)
+                FOREIGN KEY (fk_product) REFERENCES product(id),
+                FOREIGN KEY (fk_restaurant) REFERENCES restaurant(id)
             )
             ''')
 
@@ -424,14 +426,13 @@ class DB:
         
         return record[0] if record else None
     
-    def create_order(self, client_order):
+    def create_order(self, client_order, chosen_restaurant):
         """ Cria pedido de acordo com os inputs do app. (self, client_order)"""
         cur = self.connection.cursor()
 
         cur.execute('''
-        INSERT INTO client_order (order_id, fk_client, fk_product, quantity) VALUES (?, ?, ?, ?)
-        ''', (client_order.order, client_order.fk_client, client_order.fk_product, client_order.quantity)
-                    )
+        INSERT INTO client_order (order_id, fk_client, fk_product, quantity, fk_restaurant) VALUES (?, ?, ?, ?, ?)
+        ''', (client_order.order, client_order.fk_client, client_order.fk_product, client_order.quantity, chosen_restaurant))
 
         self.connection.commit()
         cur.close()
@@ -480,3 +481,17 @@ class DB:
         self.connection.commit()
         cur.close()
         
+#flask usage:
+
+    def get_orders_id(self, fk_restaurant):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT DISTINCT order_id
+                        FROM client_order
+                        WHERE fk_restaurant
+                        ''', (fk_restaurant,))
+    
+        records = cur.fetchall()
+        cur.close()
+        
+        return records

@@ -576,9 +576,9 @@ class App:
         
         
         for product, quantity in kart_array:
-            client_order = Client_order(order_number, client.pk, product, quantity)#
+            client_order = Client_order(order_number, client.pk, product, quantity, chosen_restaurant, status=None)
             
-            DB.create_order(app, client_order)
+            DB.create_order(app, client_order, chosen_restaurant)
             DB.push_current_date_order(app, current_date_login, product, order_number)
             
         self.resume_order(chosen_restaurant, client, order_number)
