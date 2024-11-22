@@ -524,3 +524,15 @@ class DB:
         cur.close()
         
         return record
+    
+    def update_status_order(self, order_number, new_status):
+        cur = self.connection.cursor()
+        
+        cur.execute('''
+                UPDATE client_order
+                SET status = ?
+                WHERE order_id = ?
+                ''', (new_status, order_number))
+        
+        self.connection.commit()
+        cur.close()

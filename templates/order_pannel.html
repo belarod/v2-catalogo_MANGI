@@ -19,7 +19,8 @@
                             <li>{{ product.name }} - {{ product.quantity }}</li>
                         {% endfor %}
 
-                        <form method="POST" action="{{ url_for('order_pannel', order_id=order.order_id) }}">
+                        <form method="POST" action="{{ url_for('order_pannel') }}">
+                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
                             {% if order.status == 0 %}
                                 <p>Criado 0</p>
                                 <button type="submit" name="action" value="accept">ACEITAR</button>

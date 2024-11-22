@@ -35,29 +35,31 @@ def login():
      return render_template('login.html') 
 
 @appFlask.route('/order_pannel', methods=['GET', 'POST'])
-def order_pannel(order_id):
+def order_pannel():
      if 'pk' not in session:
         return redirect(url_for('login'))
      
      orders = DB.get_orders_id_name(my_db, session['pk'])
      if request.method == 'POST':
           action = request.form.get('action')
+          order_id = request.form.get('order_id')
           
           if action == 'accept':
-               print('aceito')         
+               DB.update_status_order(my_db, order_id, action)        
                return redirect(url_for('order_pannel', order_id=order_id))
           elif action == 'refuse':
-               print('recusado')
+               DB.update_status_order(my_db, order_id, action)  
                return redirect(url_for('order_pannel', order_id=order_id))
           elif action == 'in_delivery':
-               print('em rota de entrega')
+               DB.update_status_order(my_db, order_id, action)  
                return redirect(url_for('order_pannel', order_id=order_id))
           elif action == 'delivered':
-               print('entregue')
+               DB.update_status_order(my_db, order_id, action)  
                return redirect(url_for('order_pannel', order_id=order_id))
      
      ####################
      
+     order_info = []
      for order in orders:
           order_id = order[0]
           client = order[1]
@@ -68,12 +70,13 @@ def order_pannel(order_id):
           products = DB.get_products_and_quantity_from_order(my_db, order_id)
           product_details = [{"name": product[0], "quantity": product[1]} for product in products]
           
-          order_info = {
+          order_info_dic = {
                "order_id": order_id,
                "client": client,
                "product_details": product_details,
                "status": status
           }
+          order_info.append(order_info_dic)
      return render_template('order_pannel.html', orders=order_info)  
            
 @appFlask.route('/order_pannel/<order_id>', methods=['GET', 'POST'])
