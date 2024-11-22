@@ -40,22 +40,13 @@ def order_pannel():
         return redirect(url_for('login'))
      
      orders = DB.get_orders_id_name(my_db, session['pk'])
+     
      if request.method == 'POST':
           action = request.form.get('action')
           order_id = request.form.get('order_id')
           
-          if action == 'accept':
-               DB.update_status_order(my_db, order_id, action)        
-               return redirect(url_for('order_pannel', order_id=order_id))
-          elif action == 'refuse':
-               DB.update_status_order(my_db, order_id, action)  
-               return redirect(url_for('order_pannel', order_id=order_id))
-          elif action == 'in_delivery':
-               DB.update_status_order(my_db, order_id, action)  
-               return redirect(url_for('order_pannel', order_id=order_id))
-          elif action == 'delivered':
-               DB.update_status_order(my_db, order_id, action)  
-               return redirect(url_for('order_pannel', order_id=order_id))
+          if action in ['1', '2', '3', '4']:
+               DB.update_status_order(my_db, order_id, action) 
      
      ####################
      

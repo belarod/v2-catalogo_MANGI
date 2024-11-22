@@ -23,14 +23,14 @@
                         <input type="hidden" name="order_id" value="{{ order.order_id }}">
                             {% if order.status == 0 %}
                                 <p>Criado 0</p>
-                                <button type="submit" name="action" value="accept">ACEITAR</button>
-                                <button type="submit" name="action" value="refuse">RECUSAR</button>
+                                <button type="submit" name="action" value="1">ACEITAR</button>
+                                <button type="submit" name="action" value="4">RECUSAR</button>
                             {% elif order.status == 1 %}
                                 <p>Aceito 1</p>
-                                <button type="submit" name="action" value="in_delivery">ENTREGA EM ANDAMENTO</button>
+                                <button type="submit" name="action" value="2">ENTREGA EM ANDAMENTO</button>
                             {% elif order.status == 2 %}
                                 <p>Saiu p entrega 2</p>
-                                <button type="submit" name="action" value="delivered">ENTREGUE</button>
+                                <button type="submit" name="action" value="3">ENTREGUE</button>
                             {% elif order.status == 3 %}
                                 <p>Entregue 3 (n devo mostrar)</p>
                             {% elif order.status == 4 %}
