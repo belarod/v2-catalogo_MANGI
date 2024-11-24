@@ -5,6 +5,7 @@ class Client_order:
                  fk_product: int,
                  quantity:int,
                  fk_restaurant:int,
+                 order_total:int,
                  status:int
                  ):
         self.order = order
@@ -12,4 +13,5 @@ class Client_order:
         self.fk_product = fk_product
         self.quantity = quantity
         self.fk_restaurant = fk_restaurant
+        self.order_total = order_total
         self.status = status

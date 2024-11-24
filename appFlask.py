@@ -77,6 +77,9 @@ def logout():
 
 @appFlask.route('/report', methods=['GET', 'POST'])
 def report():
+     average_ticket = DB.get_avg_ticket(my_db, session['pk'])
+     print(average_ticket)
+     
      return render_template('report.html') 
            
 

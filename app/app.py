@@ -576,7 +576,7 @@ class App:
         
         
         for product, quantity in kart_array:
-            client_order = Client_order(order_number, client.pk, product, quantity, chosen_restaurant, status=None)
+            client_order = Client_order(order_number, client.pk, product, quantity, chosen_restaurant, order_total=None, status=None)
             
             DB.create_order(app, client_order, chosen_restaurant)
             DB.push_current_date_order(app, current_date_login, product, order_number)
@@ -605,6 +605,7 @@ class App:
             total_price += product_price * quantity
             print(f"{product_name:<20} {product_price / 100:>15.2f} {quantity:>12}")
         
+        DB.set_order_total(app, order_number, total_price)
         print('-' * 50)    
         print(f"{'TOTAL':<20} {total_price / 100:>15.2f}")
         print('-' * 50) 

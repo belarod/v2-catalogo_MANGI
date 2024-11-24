@@ -19,7 +19,7 @@
         {% for order in orders %}
             {% if order.status != 3 and order.status != 4 %}
                 <li>
-                    <p>PEDIDO {{ order.order_id[:5] }}:</p> {#mostra apenas os 5 primeiros caracteres(UUID comprido tava poluíndo muito a tela)**/#}
+                    <p>PEDIDO {{ order.order_id[:5] }}:</p> {#mostra apenas os 5 primeiros caracteres(UUID comprido tava poluíndo muito a tela)#}
                     <p>CLIENTE {{order.client}}</p>
                     <ul>
                         {% for product in order.product_details %}

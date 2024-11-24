@@ -56,6 +56,7 @@ class DB:
                 quantity INT,
                 date_order TEXT,
                 fk_restaurant INT,
+                order_total INT DEFAULT 0,
                 status INT DEFAULT 0,
 
                 FOREIGN KEY (fk_client) REFERENCES client(id),
@@ -431,8 +432,8 @@ class DB:
         cur = self.connection.cursor()
 
         cur.execute('''
-        INSERT INTO client_order (order_id, fk_client, fk_product, quantity, fk_restaurant) VALUES (?, ?, ?, ?, ?)
-        ''', (client_order.order, client_order.fk_client, client_order.fk_product, client_order.quantity, chosen_restaurant))
+        INSERT INTO client_order (order_id, fk_client, fk_product, quantity, fk_restaurant, order_total) VALUES (?, ?, ?, ?, ?, ?)
+        ''', (client_order.order, client_order.fk_client, client_order.fk_product, client_order.quantity, chosen_restaurant, client_order.order_total))
 
         self.connection.commit()
         cur.close()
@@ -482,6 +483,18 @@ class DB:
         if record is not None:
             return record[0]
         return None
+    
+    def set_order_total(self, order_number: str, order_total: int):
+        cur = self.connection.cursor()
+        
+        cur.execute('''
+                UPDATE client_order
+                SET order_total = ?
+                WHERE order_id = ?
+                ''', (order_total, order_number))
+        
+        self.connection.commit()
+        cur.close()
     
     def push_current_date_order(self, date_order, fk_product, order_number):
         """ Insere no DB data/hora em que foi acessado. (self, current_date_login: str, pk: int)"""
@@ -536,3 +549,82 @@ class DB:
         
         self.connection.commit()
         cur.close()
+        
+#view's usage:
+
+    def get_avg_ticket(self, fk_restaurant):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT avg(order_total) AS Avg_Ticket
+                        FROM client_order
+                        GROUP BY fk_client
+                        HAVING fk_restaurant = ?;
+                        ''', (fk_restaurant,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record
+    
+    def get_most_expensive_order(self, fk_restaurant):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT order_total
+                        FROM client_order
+                        GROUP BY order_total
+                        HAVING fk_restaurant = ?
+                        ORDER BY order_total DESC
+                        LIMIT 1;
+                        ''', (fk_restaurant,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record
+        
+    def get_biggest_order_in_quantity(self, fk_restaurant):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT sum(quantity)
+                        FROM client_order
+                        GROUP BY order_total
+                        HAVING fk_restaurant = ?
+                        ORDER BY order_total DESC
+                        LIMIT 1;
+                        ''', (fk_restaurant,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record
+    
+    def get_most_ordered_product(self, fk_restaurant):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT fk_product, sum(quantity)
+                        FROM client_order
+                        GROUP BY fk_product
+                        HAVING fk_restaurant = ?
+                        ORDER BY fk_product DESC
+                        LIMIT 1;
+                        ''', (fk_restaurant,))
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record
+    
+    def get_quantity_of_products_per_status(self, fk_restaurant):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT status,
+                            count(*) AS qntd_status
+                        FROM client_order
+                        GROUP BY status
+                        HAVING fk_restaurant = ?;
+                        ''', (fk_restaurant,))
+    
+        records = cur.fetchall()
+        cur.close()
+        
+        return records
