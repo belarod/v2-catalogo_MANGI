@@ -77,8 +77,27 @@ def logout():
 
 @appFlask.route('/report', methods=['GET', 'POST'])
 def report():
+     #1
      average_ticket = DB.get_avg_ticket(my_db, session['pk'])
      print(average_ticket)
+     
+     #2
+     most_expensive_order = DB.get_most_expensive_order(my_db, session['pk'])
+     print(most_expensive_order)
+     
+     #3
+     biggest_order_in_quantity = DB.get_biggest_order_in_quantity(my_db, session['pk'])
+     print(biggest_order_in_quantity)
+     
+     #4
+     
+     #5
+     most_ordered_product = DB.get_most_ordered_product(my_db, session['pk'])
+     print(most_ordered_product)
+     
+     #6
+     quantity_of_products_per_status = DB.get_quantity_of_products_per_status(my_db, session['pk'])
+     print(quantity_of_products_per_status)
      
      return render_template('report.html') 
            
