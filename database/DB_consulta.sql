@@ -23,7 +23,7 @@ HAVING fk_restaurant = 1
 ORDER BY order_total DESC
 LIMIT 1;
 
---4. Liste a maior e a menos comissão paga pelo restaurante.
+--4. Liste a maior e a menor comissão paga pelo restaurante.
 
 --5. Qual o item mais pedido?
 
@@ -43,3 +43,25 @@ GROUP BY status
 HAVING fk_restaurant= 1;
 
 --7. Calcule a quantidade média de pedidos por cada dia da semana. Pivote o resultado.
+
+--ADMIN---------------------------------------------------
+
+--1. Quantidade de restaurantes e clientes cadastrados.
+
+SELECT count(r.id)
+FROM restaurant r;
+
+SELECT count(c.id)
+FROM client c;
+
+--2. Quantidade de clientes únicos que já fizeram um pedido em cada restaurante.
+
+SELECT co.fk_restaurant, COUNT(DISTINCT co.fk_client) AS unique_client_count
+FROM client_order co
+GROUP BY co.fk_restaurant;
+
+--3. Ticket médio por restaurante (valor médio de cada pedido).
+
+SELECT fk_restaurant, avg(co.order_total)
+FROM client_order co
+GROUP BY fk_restaurant;

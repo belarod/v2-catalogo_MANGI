@@ -27,6 +27,11 @@ class DB:
                 last_login TEXT DEFAULT 'Este é seu primeiro login!'
             )
             ''')
+        
+        cur.execute('''
+            INSERT OR IGNORE INTO restaurant (name_restaurant, commission, email, password)
+            VALUES (?, ?, ?, ?)
+            ''', ('ADMIN', 0, 'admin@gmail.com', 'Admin1'))
 
         cur.execute('''
             CREATE TABLE IF NOT EXISTS product (
@@ -550,7 +555,7 @@ class DB:
         self.connection.commit()
         cur.close()
         
-#view's usage:
+#restaurant's usage:
 
     def get_avg_ticket(self, fk_restaurant):
         cur = self.connection.cursor()
@@ -623,6 +628,58 @@ class DB:
                         GROUP BY status
                         HAVING fk_restaurant = ?;
                         ''', (fk_restaurant,))
+    
+        records = cur.fetchall()
+        cur.close()
+        
+        return records
+    
+#admin's usage:
+    def get_quantity_of_restaurants(self):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT count(r.id)
+                        FROM restaurant r;
+                        ''')
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record
+    
+    def get_quantity_of_clients(self):
+        cur = self.connection.cursor()
+        cur.execute('''
+                        SELECT count(c.id)
+                        FROM client c;
+                        ''')
+    
+        record = cur.fetchone()
+        cur.close()
+        
+        return record
+    
+    def get_unique_clients_per_restaurant(self):
+        cur = self.connection.cursor()
+        cur.execute('''
+            SELECT co.fk_restaurant, COUNT(DISTINCT co.fk_client) AS unique_client_count
+            FROM client_order co
+            GROUP BY co.fk_restaurant;
+                        ''')
+    
+        records = cur.fetchall()
+        cur.close()
+        
+        return records
+    
+    def get_average_ticket_per_restaurant(self):
+        """ Retorna o ticket médio por restaurante. (self)"""
+        cur = self.connection.cursor()
+        cur.execute('''
+            SELECT fk_restaurant, avg(co.order_total)
+            FROM client_order co
+            GROUP BY fk_restaurant;
+                        ''')
     
         records = cur.fetchall()
         cur.close()
