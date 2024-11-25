@@ -560,28 +560,30 @@ class DB:
         
 #restaurant's usage:
 #1
-    def get_avg_ticket_per_client(self, fk_restaurant):
-        ''' Retorna o ticket médio por cliente. [fk_client, valor do ticket] // tupla (self, fk_restaurant)'''
+    def get_avg_ticket(self, fk_restaurant):
+        ''' Retorna o ticket médio. [valor do ticket médio] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT fk_client, avg(order_total) AS Avg_Ticket
-                        FROM client_order
-                        GROUP BY fk_client
-                        HAVING fk_restaurant = ?;
-                        ''', (fk_restaurant,))
-    
+            SELECT avg(order_total) AS Avg_Ticket
+            FROM client_order
+            WHERE fk_restaurant = ?;
+        ''', (fk_restaurant,))
+        
         record = cur.fetchone()
         cur.close()
         
-        return record
+        if record is None:
+            return None
+        else:
+            return f"R$ {record[0] / 100:.2f}"
 #2   
     def get_most_expensive_order(self, fk_restaurant):
-        ''' Retorna o pedido mais caro. [valor do pedido] // tupla (self, fk_restaurant)'''
+        ''' Retorna o pedido mais caro. [número do pedido, valor total do pedido] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT order_total
+                        SELECT order_id, order_total
                         FROM client_order
-                        GROUP BY order_total
+                        GROUP BY order_id
                         HAVING fk_restaurant = ?
                         ORDER BY order_total DESC
                         LIMIT 1;
@@ -593,11 +595,12 @@ class DB:
         return record
 #3        
     def get_biggest_order_in_quantity(self, fk_restaurant):
-        ''' Retorna o pedido com maior quantidade de produtos. [order_id, pk_product, quantidade] // tupla (self, fk_restaurant)'''
+        ''' Retorna o pedido com maior quantidade de produtos. [número do pedido, nome do produto, quantidade] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT client_order.order_id, fk_product, sum(quantity)
-                        FROM client_order
+                        SELECT co.order_id, p.name_product, sum(co.quantity)
+                        FROM client_order co
+                        INNER JOIN product p ON co.fk_product = p.id
                         GROUP BY order_total
                         HAVING fk_restaurant = ?
                         ORDER BY order_total DESC
@@ -610,11 +613,12 @@ class DB:
         return record
 #5    
     def get_most_ordered_product(self, fk_restaurant):
-        ''' Retorna o produto mais pedido. [fk_product, quantidade] // tupla (self, fk_restaurant)'''
+        ''' Retorna o produto mais pedido. [nome do produto, quantidade] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT fk_product, sum(quantity)
-                        FROM client_order
+                        SELECT p.name_product, sum(co.quantity)
+                        FROM client_order co
+                        INNER JOIN product p ON co.fk_product = p.id
                         GROUP BY fk_product
                         HAVING fk_restaurant = ?
                         ORDER BY fk_product DESC
@@ -629,14 +633,17 @@ class DB:
     def get_quantity_of_products_per_status(self, fk_restaurant):
         ''' Retorna a quantidade de produtos por status. [status, quantidade] // conjunto de tuplas (self, fk_restaurant)'''
         cur = self.connection.cursor()
-        cur.execute('''   
-                    SELECT status,
-                        COUNT(DISTINCT order_id) AS quantity_status
-                    FROM client_order
-                    WHERE fk_restaurant = ?
-                    GROUP BY status;
-                        ''', (fk_restaurant,))
-    
+
+        cur.execute('''
+            SELECT     SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS criado,
+                SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS aceito,
+                SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS saiu_para_entrega,
+                SUM(CASE WHEN status = 3 THEN 1 ELSE 0 END) AS entregue,
+                SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS rejeitado
+            FROM client_order
+            WHERE fk_restaurant = ?
+        ''', (fk_restaurant,))
+
         records = cur.fetchall()
         cur.close()
         
