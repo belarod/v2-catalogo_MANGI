@@ -77,61 +77,63 @@ def logout():
 
 @appFlask.route('/report', methods=['GET', 'POST'])
 def report():
+     if 'pk' not in session:
+        return redirect(url_for('login'))
      #RESTAURANTS
      
      #1
-     average_ticket_per_client = DB.get_avg_ticket_per_client(my_db, session['pk'])
-     print(average_ticket_per_client)
+     average_ticket_per_clientRAW = DB.get_avg_ticket_per_client(my_db, session['pk']) #usar index [0], [1]   
      
      #2
-     most_expensive_order = DB.get_most_expensive_order(my_db, session['pk'])
-     print(most_expensive_order)
+     most_expensive_orderRAW = DB.get_most_expensive_order(my_db, session['pk'])
+     #print(most_expensive_orderRAW)
      
      #3
-     biggest_order_in_quantity = DB.get_biggest_order_in_quantity(my_db, session['pk'])
-     print(biggest_order_in_quantity)
+     biggest_order_in_quantityRAW = DB.get_biggest_order_in_quantity(my_db, session['pk'])
+     #print(biggest_order_in_quantityRAW)
      
      #4
      
      #5
-     most_ordered_product = DB.get_most_ordered_product(my_db, session['pk'])
-     print(most_ordered_product)
+     most_ordered_productRAW = DB.get_most_ordered_product(my_db, session['pk'])
+     #print(most_ordered_productRAW)
      
      #6
-     quantity_of_products_per_status = DB.get_quantity_of_products_per_status(my_db, session['pk'])
-     print(quantity_of_products_per_status)
+     quantity_of_products_per_statusRAW = DB.get_quantity_of_products_per_status(my_db, session['pk']) #usar index [0][0], [0][1]
+     print(quantity_of_products_per_statusRAW[0][0])
+     print(quantity_of_products_per_statusRAW[0][1])
      
      #ADMIN
      
      #1
-     quantity_of_restaurants = DB.get_quantity_of_restaurants(my_db)
-     print(quantity_of_restaurants)
+     quantity_of_restaurantsRAW = DB.get_quantity_of_restaurants(my_db)
+     #print(quantity_of_restaurantsRAW)
      
-     quantity_of_clients = DB.get_quantity_of_clients(my_db)
-     print(quantity_of_clients)
+     quantity_of_clientsRAW = DB.get_quantity_of_clients(my_db)
+     #print(quantity_of_clientsRAW)
      
      #2
-     unique_clients_per_restaurant = DB.get_unique_clients_per_restaurant(my_db)
-     print(unique_clients_per_restaurant)
+     unique_clients_per_restaurantRAW = DB.get_unique_clients_per_restaurant(my_db)
+     #print(unique_clients_per_restaurantRAW)
      
      #3
-     average_ticket_per_restaurant = DB.get_average_ticket_per_restaurant(my_db)
-     print(average_ticket_per_restaurant)
+     average_ticket_per_restaurantRAW = DB.get_average_ticket_per_restaurant(my_db)
+     #print(average_ticket_per_restaurantRAW)
      
      
      return render_template('report.html',
                             #RESTAURANTS
-                            average_ticket_per_client=average_ticket_per_client,
-                            most_expensive_order=most_expensive_order,
-                            biggest_order_in_quantity=biggest_order_in_quantity,
-                            most_ordered_product=most_ordered_product,
-                            quantity_of_products_per_status=quantity_of_products_per_status,
+                            average_ticket_per_client=average_ticket_per_clientRAW,
+                            most_expensive_order=most_expensive_orderRAW,
+                            biggest_order_in_quantity=biggest_order_in_quantityRAW,
+                            most_ordered_product=most_ordered_productRAW,
+                            quantity_of_products_per_status=quantity_of_products_per_statusRAW,
                             
                             #ADMIN
-                            quantity_of_restaurants=quantity_of_restaurants,
-                            quantity_of_clients=quantity_of_clients,
-                            unique_clients_per_restaurant=unique_clients_per_restaurant,
-                            average_ticket_per_restaurant=average_ticket_per_restaurant) 
+                            quantity_of_restaurants=quantity_of_restaurantsRAW,
+                            quantity_of_clients=quantity_of_clientsRAW,
+                            unique_clients_per_restaurant=unique_clients_per_restaurantRAW,
+                            average_ticket_per_restaurant=average_ticket_per_restaurantRAW) 
            
 
 if __name__ == '__main__':
