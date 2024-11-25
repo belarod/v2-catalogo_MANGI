@@ -38,10 +38,10 @@ LIMIT 1;
 --6. Quantos pedidos em cada status? Liste todos os status, mesmo que não haja pedido.
 
 SELECT status,
-       count(*) AS qntd_status
+       COUNT(DISTINCT order_id) AS qntd_status
 FROM client_order
-GROUP BY status
-HAVING fk_restaurant= 1;
+WHERE fk_restaurant = 1
+GROUP BY status;
 
 --7. Calcule a quantidade média de pedidos por cada dia da semana. Pivote o resultado.
 

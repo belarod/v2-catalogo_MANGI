@@ -68,7 +68,7 @@ def order_pannel():
                "status": status
           }
           order_info.append(order_info_dic)
-     return render_template('order_pannel.html', orders=order_info) 
+     return render_template('order_pannel.html', orders=order_info, user=session['pk']) 
 
 @appFlask.route('/logout', methods=['GET', 'POST'])
 def logout():

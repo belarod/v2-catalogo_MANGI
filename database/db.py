@@ -517,6 +517,7 @@ class DB:
 #flask usage:
 
     def get_orders_id_name(self, fk_restaurant):
+        ''' Retorna os pedidos de um restaurante. [order_id, name_client] // conjunto de tuplas (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT DISTINCT order_id, name_client
@@ -531,6 +532,7 @@ class DB:
         return records
     
     def get_order_status(self, order_number):
+        ''' Retorna o status do pedido. (self, order_number)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT DISTINCT status
@@ -544,6 +546,7 @@ class DB:
         return record
     
     def update_status_order(self, order_number, new_status):
+        ''' Atualiza o status do pedido. (self, order_number, new_status)'''
         cur = self.connection.cursor()
         
         cur.execute('''
@@ -558,6 +561,7 @@ class DB:
 #restaurant's usage:
 #1
     def get_avg_ticket_per_client(self, fk_restaurant):
+        ''' Retorna o ticket médio por cliente. [fk_client, valor do ticket] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT fk_client, avg(order_total) AS Avg_Ticket
@@ -572,6 +576,7 @@ class DB:
         return record
 #2   
     def get_most_expensive_order(self, fk_restaurant):
+        ''' Retorna o pedido mais caro. [valor do pedido] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT order_total
@@ -588,6 +593,7 @@ class DB:
         return record
 #3        
     def get_biggest_order_in_quantity(self, fk_restaurant):
+        ''' Retorna o pedido com maior quantidade de produtos. [order_id, pk_product, quantidade] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT client_order.order_id, fk_product, sum(quantity)
@@ -604,6 +610,7 @@ class DB:
         return record
 #5    
     def get_most_ordered_product(self, fk_restaurant):
+        ''' Retorna o produto mais pedido. [fk_product, quantidade] // tupla (self, fk_restaurant)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT fk_product, sum(quantity)
@@ -620,13 +627,14 @@ class DB:
         return record
 #6    
     def get_quantity_of_products_per_status(self, fk_restaurant):
+        ''' Retorna a quantidade de produtos por status. [status, quantidade] // conjunto de tuplas (self, fk_restaurant)'''
         cur = self.connection.cursor()
-        cur.execute('''
-                        SELECT status,
-                            count(*) AS qntd_status
-                        FROM client_order
-                        GROUP BY status
-                        HAVING fk_restaurant = ?;
+        cur.execute('''   
+                    SELECT status,
+                        COUNT(DISTINCT order_id) AS quantity_status
+                    FROM client_order
+                    WHERE fk_restaurant = ?
+                    GROUP BY status;
                         ''', (fk_restaurant,))
     
         records = cur.fetchall()
@@ -637,6 +645,7 @@ class DB:
 #admin's usage:
 #1
     def get_quantity_of_restaurants(self):
+        ''' Retorna a quantidade de restaurantes. [quantidade de restaurantes] /fazer -1 pois o admin é considerado um 'restaurante' (self)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT count(r.id)
@@ -649,6 +658,7 @@ class DB:
         return record
     
     def get_quantity_of_clients(self):
+        ''' Retorna a quantidade de clientes. [quantidade de clientes] (self)'''
         cur = self.connection.cursor()
         cur.execute('''
                         SELECT count(c.id)
@@ -661,6 +671,7 @@ class DB:
         return record
 #2    
     def get_unique_clients_per_restaurant(self):
+        ''' Retorna a quantidade de clientes únicos por restaurante. [fk_restaurant, quantidade de clientes únicos] // conjunto de tuplas (self)'''
         cur = self.connection.cursor()
         cur.execute('''
             SELECT co.fk_restaurant, COUNT(DISTINCT co.fk_client) AS unique_client_count
@@ -674,7 +685,7 @@ class DB:
         return records
 #3    
     def get_average_ticket_per_restaurant(self):
-        """ Retorna o ticket médio por restaurante. (self)"""
+        ''' Retorna o ticket médio por restaurante. [fk_restaurant, ticket médio] // conjunto de tuplas (self)'''
         cur = self.connection.cursor()
         cur.execute('''
             SELECT fk_restaurant, avg(co.order_total)
