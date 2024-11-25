@@ -77,9 +77,11 @@ def logout():
 
 @appFlask.route('/report', methods=['GET', 'POST'])
 def report():
+     #RESTAURANTS
+     
      #1
-     average_ticket = DB.get_avg_ticket(my_db, session['pk'])
-     print(average_ticket)
+     average_ticket_per_client = DB.get_avg_ticket_per_client(my_db, session['pk'])
+     print(average_ticket_per_client)
      
      #2
      most_expensive_order = DB.get_most_expensive_order(my_db, session['pk'])
@@ -99,7 +101,37 @@ def report():
      quantity_of_products_per_status = DB.get_quantity_of_products_per_status(my_db, session['pk'])
      print(quantity_of_products_per_status)
      
-     return render_template('report.html') 
+     #ADMIN
+     
+     #1
+     quantity_of_restaurants = DB.get_quantity_of_restaurants(my_db)
+     print(quantity_of_restaurants)
+     
+     quantity_of_clients = DB.get_quantity_of_clients(my_db)
+     print(quantity_of_clients)
+     
+     #2
+     unique_clients_per_restaurant = DB.get_unique_clients_per_restaurant(my_db)
+     print(unique_clients_per_restaurant)
+     
+     #3
+     average_ticket_per_restaurant = DB.get_average_ticket_per_restaurant(my_db)
+     print(average_ticket_per_restaurant)
+     
+     
+     return render_template('report.html',
+                            #RESTAURANTS
+                            average_ticket_per_client=average_ticket_per_client,
+                            most_expensive_order=most_expensive_order,
+                            biggest_order_in_quantity=biggest_order_in_quantity,
+                            most_ordered_product=most_ordered_product,
+                            quantity_of_products_per_status=quantity_of_products_per_status,
+                            
+                            #ADMIN
+                            quantity_of_restaurants=quantity_of_restaurants,
+                            quantity_of_clients=quantity_of_clients,
+                            unique_clients_per_restaurant=unique_clients_per_restaurant,
+                            average_ticket_per_restaurant=average_ticket_per_restaurant) 
            
 
 if __name__ == '__main__':

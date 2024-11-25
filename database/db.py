@@ -556,11 +556,11 @@ class DB:
         cur.close()
         
 #restaurant's usage:
-
-    def get_avg_ticket(self, fk_restaurant):
+#1
+    def get_avg_ticket_per_client(self, fk_restaurant):
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT avg(order_total) AS Avg_Ticket
+                        SELECT fk_client, avg(order_total) AS Avg_Ticket
                         FROM client_order
                         GROUP BY fk_client
                         HAVING fk_restaurant = ?;
@@ -570,7 +570,7 @@ class DB:
         cur.close()
         
         return record
-    
+#2   
     def get_most_expensive_order(self, fk_restaurant):
         cur = self.connection.cursor()
         cur.execute('''
@@ -586,11 +586,11 @@ class DB:
         cur.close()
         
         return record
-        
+#3        
     def get_biggest_order_in_quantity(self, fk_restaurant):
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT sum(quantity)
+                        SELECT client_order.order_id, fk_product, sum(quantity)
                         FROM client_order
                         GROUP BY order_total
                         HAVING fk_restaurant = ?
@@ -602,7 +602,7 @@ class DB:
         cur.close()
         
         return record
-    
+#5    
     def get_most_ordered_product(self, fk_restaurant):
         cur = self.connection.cursor()
         cur.execute('''
@@ -618,7 +618,7 @@ class DB:
         cur.close()
         
         return record
-    
+#6    
     def get_quantity_of_products_per_status(self, fk_restaurant):
         cur = self.connection.cursor()
         cur.execute('''
@@ -635,6 +635,7 @@ class DB:
         return records
     
 #admin's usage:
+#1
     def get_quantity_of_restaurants(self):
         cur = self.connection.cursor()
         cur.execute('''
@@ -658,7 +659,7 @@ class DB:
         cur.close()
         
         return record
-    
+#2    
     def get_unique_clients_per_restaurant(self):
         cur = self.connection.cursor()
         cur.execute('''
@@ -671,7 +672,7 @@ class DB:
         cur.close()
         
         return records
-    
+#3    
     def get_average_ticket_per_restaurant(self):
         """ Retorna o ticket médio por restaurante. (self)"""
         cur = self.connection.cursor()
