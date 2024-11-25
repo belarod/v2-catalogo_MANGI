@@ -41,7 +41,26 @@
             <p>Rejeitado:</p>
                 <p>{{quantity_of_products_per_status[0][4]}}</p>
         {% else %}
-            <p>ADMIN</p>
+            <h1>Relatório Administrativo</h1>
+
+            <p>1. Quantidade de restaurantes cadastrados: {{quantity_of_restaurants[0]-1}}</p>
+            <p>1.1. Quantidade de clientes cadastrados: {{quantity_of_clients[0]}}</p>
+
+            <p>2. Quantidade de clientes únicos que já fizeram pedido em cada restaurante:</p>
+            <ul>
+                {% for restaurant in unique_clients_per_restaurant %}
+                    <li>{{ restaurant[0] }}</li>
+                    <li>{{ restaurant[1] }}</li> 
+                {% endfor %}
+            </ul>
+
+            <p>3. Ticket médio por restaurante:</p>
+            <ul>
+                {% for restaurant in average_ticket_per_restaurant %}
+                    <li>{{ restaurant[0] }}</li>
+                    <li>R$ {{ '%.2f' | format(restaurant[1] / 100) }}</li> 
+                {% endfor %}
+            </ul>
         {% endif %}
     </div>
 </body>

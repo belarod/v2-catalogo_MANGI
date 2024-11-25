@@ -132,7 +132,8 @@ def report():
                             quantity_of_restaurants=quantity_of_restaurantsRAW,
                             quantity_of_clients=quantity_of_clientsRAW,
                             unique_clients_per_restaurant=unique_clients_per_restaurantRAW,
-                            average_ticket_per_restaurant=average_ticket_per_restaurantRAW) 
+                            average_ticket_per_restaurant=average_ticket_per_restaurantRAW,
+                            user=session['pk']) 
            
 
 if __name__ == '__main__':

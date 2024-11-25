@@ -592,7 +592,10 @@ class DB:
         record = cur.fetchone()
         cur.close()
         
-        return record
+        if record is None:
+            return None
+        else:
+            return record
 #3        
     def get_biggest_order_in_quantity(self, fk_restaurant):
         ''' Retorna o pedido com maior quantidade de produtos. [número do pedido, nome do produto, quantidade] // tupla (self, fk_restaurant)'''
@@ -610,7 +613,10 @@ class DB:
         record = cur.fetchone()
         cur.close()
         
-        return record
+        if record is None:
+            return None
+        else:
+            return record
 #5    
     def get_most_ordered_product(self, fk_restaurant):
         ''' Retorna o produto mais pedido. [nome do produto, quantidade] // tupla (self, fk_restaurant)'''
@@ -628,7 +634,10 @@ class DB:
         record = cur.fetchone()
         cur.close()
         
-        return record
+        if record is None:
+            return None
+        else:
+            return record
 #6    
     def get_quantity_of_products_per_status(self, fk_restaurant):
         ''' Retorna a quantidade de produtos por status. [status, quantidade] // conjunto de tuplas (self, fk_restaurant)'''
@@ -647,7 +656,10 @@ class DB:
         records = cur.fetchall()
         cur.close()
         
-        return records
+        if records is None:
+            return None
+        else:
+            return records
     
 #admin's usage:
 #1
@@ -655,41 +667,53 @@ class DB:
         ''' Retorna a quantidade de restaurantes. [quantidade de restaurantes] /fazer -1 pois o admin é considerado um 'restaurante' (self)'''
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT count(r.id)
-                        FROM restaurant r;
+            SELECT count(r.id)
+            FROM restaurant r;
                         ''')
     
         record = cur.fetchone()
         cur.close()
         
-        return record
+        if record is None:
+            return None
+        else:
+            return record
     
     def get_quantity_of_clients(self):
         ''' Retorna a quantidade de clientes. [quantidade de clientes] (self)'''
         cur = self.connection.cursor()
         cur.execute('''
-                        SELECT count(c.id)
-                        FROM client c;
+            SELECT count(c.id)
+            FROM client c;
                         ''')
     
         record = cur.fetchone()
         cur.close()
         
-        return record
+        if record is None:
+            return None
+        else:
+            return record
 #2    
     def get_unique_clients_per_restaurant(self):
         ''' Retorna a quantidade de clientes únicos por restaurante. [fk_restaurant, quantidade de clientes únicos] // conjunto de tuplas (self)'''
         cur = self.connection.cursor()
         cur.execute('''
-            SELECT co.fk_restaurant, COUNT(DISTINCT co.fk_client) AS unique_client_count
+            SELECT R.name_restaurant,
+                count(DISTINCT co.fk_client) AS unique_client_count
             FROM client_order co
+            INNER JOIN product p on p.id = co.fk_product
+            INNER JOIN restaurant r on r.id = co.fk_restaurant
             GROUP BY co.fk_restaurant;
                         ''')
     
         records = cur.fetchall()
         cur.close()
         
-        return records
+        if records is None:
+            return None
+        else:
+            return records
 #3    
     def get_average_ticket_per_restaurant(self):
         ''' Retorna o ticket médio por restaurante. [fk_restaurant, ticket médio] // conjunto de tuplas (self)'''
@@ -703,4 +727,7 @@ class DB:
         records = cur.fetchall()
         cur.close()
         
-        return records
+        if records is None:
+            return None
+        else:
+            return records
