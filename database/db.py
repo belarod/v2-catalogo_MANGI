@@ -575,7 +575,7 @@ class DB:
         if record is None:
             return None
         else:
-            return f"R$ {record[0] / 100:.2f}"
+            return f"R$ {record[0] / 100:.2f}" if record[0] is not None else "R$ 0.00"
 #2   
     def get_most_expensive_order(self, fk_restaurant):
         ''' Retorna o pedido mais caro. [número do pedido, valor total do pedido] // tupla (self, fk_restaurant)'''

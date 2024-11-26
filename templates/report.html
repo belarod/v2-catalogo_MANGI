@@ -3,65 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='report.css') }}">
     <title>MANGI</title>
 </head>
 <body>
-    <form action="{{ url_for('logout') }}" method="GET">
-        <button type="submit">LOGOUT</button>
-    </form>
-    <form action="{{ url_for('order_pannel') }}" method="GET">
-        <button type="submit">PEDIDOS</button>
-    </form>
-
-    <div>
+    <div class="container">
         {% if user != 1 %}
-            <h1>Relatório do Restaurante</h1>
-
+        <h1>Relatório do Restaurante</h1>
+        
+        <div class="item">
             <p>1. Ticket médio: {{average_ticket}}</p>
-            
+        </div>
+        
+        <div class="item">
             <p>2. Maior compra (valor): R$ {{ '%.2f' | format(most_expensive_order[1] / 100) }}</p>
             <p>Pedido: {{most_expensive_order[0]}}</p>
-
+        </div>
+        
+        <div class="item">
             <p>3. Maior pedido (quantidade): {{biggest_order_in_quantity[0]}}</p>
             <p>Produto: {{biggest_order_in_quantity[1]}} </p>
             <p>Quantidade: {{biggest_order_in_quantity[2]}}</p>
-
+        </div>
+        
+        <div class="item">
             <p>5. Produto mais pedido: {{most_ordered_product[0]}}</p>
-            <p>Quantidade: {{most_ordered_product[1]}}</p>]
-
+            <p>Quantidade: {{most_ordered_product[1]}}</p>
+        </div>
+        
+        <div class="item">
             <p>6. Quantos pedidos em cada status:</p>
-            <p>Criado:</p>
-                <p>{{quantity_of_products_per_status[0][0]}}</p
-            <p>Aceito:</p>               
-                <p>{{quantity_of_products_per_status[0][1]}}</p>                
-            <p>Saiu para entrega:</p>
-                <p>{{quantity_of_products_per_status[0][2]}}</p>
-            <p>Entregue:</p>
-                <p>{{quantity_of_products_per_status[0][3]}}</p>
-            <p>Rejeitado:</p>
-                <p>{{quantity_of_products_per_status[0][4]}}</p>
+            <p>Criado: {{quantity_of_products_per_status[0][0]}}</p>
+            <p>Aceito: {{quantity_of_products_per_status[0][1]}}</p>
+            <p>Saiu para entrega: {{quantity_of_products_per_status[0][2]}}</p>
+            <p>Entregue: {{quantity_of_products_per_status[0][3]}}</p>
+            <p>Rejeitado: {{quantity_of_products_per_status[0][4]}}</p>
+        </div>
+
         {% else %}
+
             <h1>Relatório Administrativo</h1>
-
-            <p>1. Quantidade de restaurantes cadastrados: {{quantity_of_restaurants[0]-1}}</p>
-            <p>1.1. Quantidade de clientes cadastrados: {{quantity_of_clients[0]}}</p>
-
-            <p>2. Quantidade de clientes únicos que já fizeram pedido em cada restaurante:</p>
-            <ul>
-                {% for restaurant in unique_clients_per_restaurant %}
+            
+            <div class="item">
+                <p>1. Quantidade de restaurantes cadastrados: {{quantity_of_restaurants[0]-1}}</p>
+                <p>1.1. Quantidade de clientes cadastrados: {{quantity_of_clients[0]}}</p>
+            </div>
+            
+            <div class="item">
+                <p>2. Quantidade de clientes únicos que já fizeram pedido em cada restaurante:</p>
+                <ul>
+                    {% for restaurant in unique_clients_per_restaurant %}
+                    <div class="card">
+                        <li>{{ restaurant[0] }}</li>
+                        <li>{{ restaurant[1] }}</li>
+                    </div>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="item">
+                <p>3. Ticket médio por restaurante:</p>
+                <ul>
+                    {% for restaurant in average_ticket_per_restaurant %}
                     <li>{{ restaurant[0] }}</li>
-                    <li>{{ restaurant[1] }}</li> 
-                {% endfor %}
-            </ul>
-
-            <p>3. Ticket médio por restaurante:</p>
-            <ul>
-                {% for restaurant in average_ticket_per_restaurant %}
-                    <li>{{ restaurant[0] }}</li>
-                    <li>R$ {{ '%.2f' | format(restaurant[1] / 100) }}</li> 
-                {% endfor %}
-            </ul>
+                    <li>R$ {{ '%.2f' | format(restaurant[1] / 100) }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endif %}
-    </div>
-</body>
-</html>
+            <form action="{{ url_for('logout') }}" method="GET">
+                <button class="default_btn" type="submit">LOGOUT</button>
+            </form>
+            <form action="{{ url_for('order_pannel') }}" method="GET">
+                <button class="default_btn" type="submit">PEDIDOS</button>
+            </form>
+        </div>
+    </body>
+    </html>
