@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Macondo&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+
+    font-family: "Montserrat", serif;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -20,6 +31,13 @@
     width: 10%;
 }
 
+.login_btn:hover {
+    background-color: #555;
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
 h1 {
     color: #333;
+    font-family: "Macondo", serif;
 }
