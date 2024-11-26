@@ -14,11 +14,10 @@
             <h1>Pedidos</h1>
             {% for order in orders %}
             {% if order.status != 3 and order.status != 4 %}
-            <div class="container_order">
-                <li>
+                <li class="container_order">
                     <p>PEDIDO {{ order.order_id[:5] }}:</p> {#mostra apenas os 5 primeiros caracteres(UUID comprido tava poluíndo muito a tela)#}
                     <p>CLIENTE {{order.client}}</p>
-                    <ul>
+                    <ul class="item">
                         {% for product in order.product_details %}
                         <li>{{ product.name }} - {{ product.quantity }}</li>
                         {% endfor %}
@@ -37,7 +36,6 @@
                         </form>
                     </ul>
                 </li>
-            </div>
             {% endif %}
             {% endfor %}
             {% else %}
