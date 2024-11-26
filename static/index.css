@@ -1,0 +1,25 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(247, 232, 232);
+
+    width: 100vw;
+   height: 100vh;
+}
+
+.login_btn{
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 10%;
+}
+
+h1 {
+    color: #333;
+}
