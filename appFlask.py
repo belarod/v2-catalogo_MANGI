@@ -82,22 +82,18 @@ def report():
      #RESTAURANTS
      
      #1
-     average_ticketRAW = DB.get_avg_ticket(my_db, session['pk']) #usar index [0], [1] 
-     #print(average_ticketRAW)  
+     average_ticketRAW = DB.get_avg_ticket(my_db, session['pk']) #usar index [0], [1]  
      
      #2
      most_expensive_orderRAW = DB.get_most_expensive_order(my_db, session['pk'])
-     #print(most_expensive_orderRAW)
      
      #3
      biggest_order_in_quantityRAW = DB.get_biggest_order_in_quantity(my_db, session['pk'])
-     #print(biggest_order_in_quantityRAW)
      
      #4
      
      #5
      most_ordered_productRAW = DB.get_most_ordered_product(my_db, session['pk'])
-     #print(most_ordered_productRAW)
      
      #6
      quantity_of_products_per_statusRAW = DB.get_quantity_of_products_per_status(my_db, session['pk']) #usar index [0][0], [0][1]
@@ -106,19 +102,15 @@ def report():
      
      #1
      quantity_of_restaurantsRAW = DB.get_quantity_of_restaurants(my_db)
-     #print(quantity_of_restaurantsRAW)
      
      quantity_of_clientsRAW = DB.get_quantity_of_clients(my_db)
-     #print(quantity_of_clientsRAW)
      
      #2
      unique_clients_per_restaurantRAW = DB.get_unique_clients_per_restaurant(my_db)
-     #print(unique_clients_per_restaurantRAW)
+
      
      #3
      average_ticket_per_restaurantRAW = DB.get_average_ticket_per_restaurant(my_db)
-     #print(average_ticket_per_restaurantRAW)
-     
      
      return render_template('report.html',
                             #RESTAURANTS

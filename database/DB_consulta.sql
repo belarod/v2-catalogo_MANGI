@@ -1,26 +1,28 @@
 --1. Qual a média de gasto de cada pessoa?
 
-SELECT fk_client, avg(order_total) AS Avg_Ticket
+SELECT avg(order_total) AS Avg_Ticket
 FROM client_order
-GROUP BY fk_client
-HAVING fk_restaurant = 1;
+WHERE fk_restaurant = ?;
 
 
 --2. Qual a maior compra (em valor) feita no restaurante?
 
-SELECT order_total
+SELECT order_id, order_total
 FROM client_order
-GROUP BY order_total
-HAVING fk_restaurant = 1
+GROUP BY order_id
+HAVING fk_restaurant = ?
 ORDER BY order_total DESC
 LIMIT 1;
 
 --3. Qual o maior pedido (em quantidade de itens) feita no restaurante?
 
-SELECT client_order.order_id, fk_product, sum(quantity)
-FROM client_order
+SELECT co.order_id,
+    p.name_product,
+    sum(co.quantity)
+FROM client_order co
+INNER JOIN product p ON co.fk_product = p.id
 GROUP BY order_total
-HAVING fk_restaurant = 1
+HAVING fk_restaurant = ?
 ORDER BY order_total DESC
 LIMIT 1;
 
@@ -28,20 +30,25 @@ LIMIT 1;
 
 --5. Qual o item mais pedido?
 
-SELECT fk_product, sum(quantity)
-FROM client_order
+SELECT p.name_product,
+    sum(co.quantity)
+FROM client_order co
+INNER JOIN product p ON co.fk_product = p.id
 GROUP BY fk_product
-HAVING fk_restaurant = 1
+HAVING fk_restaurant = ?
 ORDER BY fk_product DESC
 LIMIT 1;
 
 --6. Quantos pedidos em cada status? Liste todos os status, mesmo que não haja pedido.
 
-SELECT status,
-       COUNT(DISTINCT order_id) AS qntd_status
+SELECT 
+    SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS criado,
+    SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS aceito,
+    SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS saiu_para_entrega,
+    SUM(CASE WHEN status = 3 THEN 1 ELSE 0 END) AS entregue,
+    SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS rejeitado
 FROM client_order
-WHERE fk_restaurant = 1
-GROUP BY status;
+WHERE fk_restaurant = ?;
 
 --7. Calcule a quantidade média de pedidos por cada dia da semana. Pivote o resultado.
 
@@ -57,8 +64,11 @@ FROM client c;
 
 --2. Quantidade de clientes únicos que já fizeram um pedido em cada restaurante.
 
-SELECT co.fk_restaurant, COUNT(DISTINCT co.fk_client) AS unique_client_count
+SELECT R.name_restaurant,
+    count(DISTINCT co.fk_client) AS unique_client_count
 FROM client_order co
+INNER JOIN product p on p.id = co.fk_product
+INNER JOIN restaurant r on r.id = co.fk_restaurant
 GROUP BY co.fk_restaurant;
 
 --3. Ticket médio por restaurante (valor médio de cada pedido).
@@ -121,18 +131,18 @@ INSERT INTO client (name_client, email, password) VALUES
 ('Isabela Pereira', 'cliente15@gmail.com', 'Senha15');
 
 INSERT INTO client_order (order_id, fk_client, fk_product, quantity, date_order, fk_restaurant, order_total, status) VALUES
-('f47ac10b-58cc-4372-a567-0e02b2c3d479', 1, 1, 2, '23-11-2024 20:39:19', 1, 15000, 0),
+('f47ac10b-58cc-4372-a567-0e02b2c3d479', 1, 1, 2, '23-11-2024 20:39:19', 2, 15000, 0),
 ('2c6ee24b-52d8-4c92-9f74-d98f8c7b2b91', 2, 2, 3, '23-11-2024 20:40:45', 2, 20000, 0),
 ('0c9b2d11-9f65-47e5-b5c8-c7cb4596b2b8', 3, 3, 1, '23-11-2024 20:42:12', 3, 12000, 0),
 ('ee6db7b7-d859-4edb-9539-5f842dfb5c3b', 4, 4, 4, '23-11-2024 20:43:30', 4, 10000, 0),
-('b624be61-2a50-4d71-8b3c-bc01758ad237', 5, 5, 2, '23-11-2024 20:45:00', 1, 25000, 0),
+('b624be61-2a50-4d71-8b3c-bc01758ad237', 5, 5, 2, '23-11-2024 20:45:00', 2, 25000, 0),
 ('b351ff97-cc71-46b1-bfbb-6a44a473b3a3', 6, 6, 3, '23-11-2024 20:46:25', 2, 27000, 0),
 ('1950e4a0-9287-4131-87a1-228b672b9c6f', 7, 7, 1, '23-11-2024 20:47:50', 3, 22000, 0),
 ('3bb0a1f8-5b9c-42f1-935b-56073d538982', 1, 1, 5, '23-11-2024 20:49:15', 4, 85000, 0),
-('0e61e777-d110-411f-92a7-b63a8f443c9c', 2, 2, 2, '23-11-2024 20:50:40', 1, 60000, 0),
+('0e61e777-d110-411f-92a7-b63a8f443c9c', 2, 2, 2, '23-11-2024 20:50:40', 3, 60000, 0),
 ('e7d6991d-b241-4bc3-9e88-d90c933c7c77', 3, 3, 3, '23-11-2024 20:52:05', 2, 39000, 0),
 ('2e83d73f-79f2-49a7-84a3-d272a5cf8b25', 4, 4, 4, '23-11-2024 20:53:30', 3, 64000, 0),
 ('7d1cd743-3a0d-40c3-b3d3-0ff1f3b0bdfb', 5, 5, 3, '23-11-2024 20:54:55', 4, 72000, 0),
-('465493e5-02de-4536-b6b0-f1cd6a9c78cf', 6, 6, 2, '23-11-2024 20:56:20', 1, 28000, 0),
+('465493e5-02de-4536-b6b0-f1cd6a9c78cf', 6, 6, 2, '23-11-2024 20:56:20', 2, 28000, 0),
 ('abf8f62f-c7c7-42fa-b5b5-299660d9c848', 7, 7, 1, '23-11-2024 20:57:45', 2, 20000, 0),
 ('d20a80be-63d1-4d57-9c2c-e7f0a9304fd5', 1, 1, 5, '23-11-2024 20:59:10', 3, 50000, 0);

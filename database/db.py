@@ -644,13 +644,14 @@ class DB:
         cur = self.connection.cursor()
 
         cur.execute('''
-            SELECT     SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS criado,
+            SELECT 
+                SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS criado,
                 SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS aceito,
                 SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS saiu_para_entrega,
                 SUM(CASE WHEN status = 3 THEN 1 ELSE 0 END) AS entregue,
                 SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS rejeitado
             FROM client_order
-            WHERE fk_restaurant = ?
+            WHERE fk_restaurant = ?;
         ''', (fk_restaurant,))
 
         records = cur.fetchall()
