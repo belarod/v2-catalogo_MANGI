@@ -3,21 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
     <title>MANGI</title>
   </head>
   <body>
     <div>
-      <h1>MANGI</h1>
-
-      <div>
-        <form method="POST">
+      
+      <div class="container">
+        <form method="POST" class="login_card">
+          <h1>MANGI</h1>
           {% if error %}
               <p style="color: red;">{{ error }}</p>
           {% endif %}
-
           <input type="email" placeholder="Email" id="email" name="email" required/>
           <input type="password" placeholder="Senha" id="password" name="password" required/>
-          <button type="submit">Entrar</button>
+          <button type="submit" class="login_btn">Entrar</button>
         </form>
       </div>
     </div>

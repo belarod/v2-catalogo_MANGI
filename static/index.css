@@ -7,6 +7,13 @@
     text-decoration: none;
 
     font-family: "Montserrat", serif;
+    font-size: 1.1rem;
+}
+
+html{
+    background-color: rgb(247, 232, 232);
+    width: 100%;
+    height: 100%;
 }
 
 .container {
@@ -16,8 +23,8 @@
     align-items: center;
     background-color: rgb(247, 232, 232);
 
-    width: 100vw;
-   height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 .login_btn{
@@ -40,4 +47,12 @@
 h1 {
     color: #333;
     font-family: "Macondo", serif;
+    font-size: 2.5em;
+    text-align: center;
+}
+
+button, input{
+    border: none;
+    border-radius: 8px;
+    padding: 5px;
 }

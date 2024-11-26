@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Macondo&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
+
 * {
     margin: 0;
     padding: 0;
@@ -23,8 +24,8 @@ html{
     align-items: center;
     background-color: rgb(247, 232, 232);
 
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 h1 {
@@ -34,20 +35,7 @@ h1 {
     text-align: center;
 }
 
-.login_card{
-    background-color: rgb(228, 203, 203);;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-
-    border-radius: 8px;
-    width: 15%;
-    height: 30%;
-}
-
-.login_btn {
+.default_btn {
     margin-top: 20px;
     padding: 10px;
     background-color: #333;
@@ -58,18 +46,42 @@ h1 {
     width: fit-content;
 }
 
-.login_btn:hover {
+.default_btn:hover {
     background-color: #555;
     transform: scale(1.05);
     transition: transform 0.2s ease-in-out;
 }
 
-button, input{
-    border: none;
+.container_order {
+    display: flex;
+    gap: 20px;
+    margin: 20px;
+    padding: 10px;
+
+    background-color: rgb(228, 203, 203);
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
     border-radius: 8px;
-    padding: 5px;
 }
 
-input:focus {
-    outline: none;
+ul, ol {
+    list-style: none;
 }
+
+.action_btn {
+    padding: 5px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.action_btn:hover {
+    background-color: #555;
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+} 
